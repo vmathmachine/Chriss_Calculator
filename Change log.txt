@@ -1,0 +1,11 @@
+Here's what changed:
+
+The "CTRL+A+C" and "CTRL+V" buttons have been changed to the more concise "Copy" and "Paste". Their order has also been swapped, which MIGHT take some getting used to.
+
+A bug was fixed where raising "Complex Overflow" to the power of a real non-integer would cause the app to execute an infinite recursion loop and/or crash to the home screen.
+
+Every function and constant containing a weird symbol now has an alternate form that is keyboard typable. For instance, √ can also be typed as sqrt, and π can also be typed as pi.
+
+The Bessel J functions were added. To use them, please type "BesselJ(" followed by two parameters, the subscript, and the input, respectively. The subscript can be any number, even complex numbers. However, when the absolute value of the subscript gets too big, the function tends to become unstable. This happens around alpha=±15 in the real direction, or alpha = ±5i in the imaginary direction. The Bessel Y functions are still being worked on.
+
+The code for the buttons on the keypad was rewritten. This shouldn't cause any noticeable differences, it's just spaghetti code being rewritten into non-spaghetti code for the sake of maintainability.
