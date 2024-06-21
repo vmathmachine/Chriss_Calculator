@@ -127,6 +127,8 @@ void initializeHistoryDisplay(final float lrBuff, final float topHig, final floa
   query.setTextPosAndAdjust(inpBuffX,inpBuffY); //set the position of the text within the textbox
   query.setCursorThick(thick2);                 //set the cursor thickness
   
+  query.setMargin(relativeMarginWidth*width); //give us some more space on the left and right
+  
   io.setTyper(query); //set the typer to the query box
 }
 

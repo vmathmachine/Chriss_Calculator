@@ -58,6 +58,8 @@ PGraphics defDrawer; //pgraphics object to display using the default engine
 
 static char dirChar;
 
+final static float relativeMarginWidth = 0.037;
+
 void settings() {
   System.setProperty("jogl.disable.openglcore", "false");
   size(450,900,P2D);

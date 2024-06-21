@@ -988,6 +988,12 @@ public static class CMatrix { //Complex Matrix
     return eigenvectorsGivenEigenvalues(eigenvalues()); //default: grab the eigenvalues, use those to compute the eigenvectors
   }
   
+  Object[] eigenvalues_and_vectors() {
+    Complex[] val = eigenvalues();
+    CVector[] vec = eigenvectorsGivenEigenvalues(eigenvalues());
+    return new Object[] {val, vec};
+  }
+  
   ///////////////////////////////////////// POWERS, LOGARITHMS, AND OTHER IMPORTANT FUNCTIONS //////////////////////////////////////
   
   CMatrix sq() { return mul(this); } //square

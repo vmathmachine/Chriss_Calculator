@@ -17,7 +17,7 @@ public static class Button extends Box {
   ClickProgressor progress = new ClickProgressor(); //tracks how the user interacts with it
   
   boolean selectOnPress  =false , //if true, button only registers press if it was selected when you first clicked (if false, moving your mouse into the hitbox will always select it, so long as it's pressed and in button mode)
-          selectOnRelease=true ; //if true, button only registers release if it was selected when you released it (if false, moving your mouse out of the hitbox won't deselect it)
+          selectOnRelease=true ;  //if true, button only registers release if it was selected when you released it (if false, moving your mouse out of the hitbox won't deselect it)
   
   //example of button where select on press is false: most smartphone touch screen buttons, where you can press something, then move your cursor away as you realized you pressed the wrong button, then move your cursor back to the right button & press it
   //example of button where select on release is false: up and down arrows on a scroll bar. If you press those, then move your cursor, they stay pressed
@@ -102,6 +102,9 @@ public static class Button extends Box {
         if(code==1) {              //if the cursor just pressed:
           cursors.put(curs, true); //push this cursor to the list, with hold being true
           onPress.act();           //perform the onPress event
+          if(onPress != emptyAction) {   //if an action was performed:
+            mmio.updatePressCount(this); //update the press counters for each button
+          }
           if(cursors.size()==1) { firstActivated = System.currentTimeMillis(); } //set the exact time when this button was pressed (unless another cursor already beat us to it)
         }
         else if(curs.press!=0 && !selectOnPress && curs.select instanceof Button) { //otherwise, if the cursor is already pressed and in button-select mode, and we're allowed to do it this way:

@@ -194,7 +194,7 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
           
           //case BACKSPACE: { //(Android only) Backspace is a keyCode rather than a key. Also DELETE is the same as BACKSPACE
           //  if(ctrlHeld) { typer.ctrlBackspace(true,snap,true); }
-          //  else         { typer.backspace(true,snap,true); }
+          //  else         { typer.    backspace(true,snap,true); }
           //} break;
         } break;
         case 0: switch(keyCode) {

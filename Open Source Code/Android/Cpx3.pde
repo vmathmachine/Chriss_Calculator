@@ -558,47 +558,197 @@ public static class Cpx3 extends Cpx2 {
   
   //////////////////////////// BESSEL /////////////////////////////
   
-  public static Complex besselJ(Complex a, Complex z) {
+  public static Complex besselJ(Complex a, Complex z) { //the Bessel J function
     if(0.00585385632d*z.re*z.re + 0.00242167992d*z.im*z.im < 1) {
-      return besselJ_taylor(a, z, 32);
+      return besselJ_taylor(a, z, 32); //if close to 0, return a Taylor's series
     }
-    return besselJ_asymp(a, z, 32);
+    return besselJ_asymp(a, z, 32); //otherwise, return an asymptotic expansion
+  }
+  
+  public static Complex besselY(Complex a, Complex z) { //the Bessel Y function
+    if(0.00585385632d*z.re*z.re + 0.00242167992d*z.im*z.im < 1) {
+      return besselJY_taylor(a, z, 32)[1]; //if close to 0, return a Taylor's series (kind of)
+    }
+    return besselY_asymp(a, z, 32); //otherwise, return an asymptotic expansion
+  }
+  
+  public static Complex[] besselJY(Complex a, Complex z) { //both Bessel functions
+    if(0.00585385632d*z.re*z.re + 0.00242167992d*z.im*z.im < 1) {
+      return besselJY_taylor(a, z, 32); //if close to 0, return their Taylor's series
+    }
+    return besselJY_asymp(a, z, 32); //otherwise, return their asymptotic expansion
+  }
+  
+  public static Complex besselI(Complex a, Complex z) { //the modified Bessel I function
+    return besselJ(a, z.mulI()) .muleq(exp(a.mulI(-HALFPI))); //take J of zi, then divide by i^a
+  }
+  
+  public static Complex besselK(Complex a, Complex z) { //the modified Bessel K function
+    if(z.im>=0) { return besselH2(a,z.mulI()).muleq(exp(a.add(1).mulI(-HALFPI))); } //it should be noted that both of these are equivalent for z.re>0
+    else        { return besselH1(a,z.mulI()).muleq(exp(a.add(1).mulI( HALFPI))); }
+  }
+  
+  public static Complex besselH1(Complex a, Complex z) { //the Hankel function #1
+    Complex[] jy = besselJY(a,z); //compute J and Y
+    return jy[0].addeq(jy[1].muleqI()); //return J+Yi
+  }
+  
+  public static Complex besselH2(Complex a, Complex z) { //the Hankel function #2
+    Complex[] jy = besselJY(a,z); //compute J and Y
+    return jy[0].subeq(jy[1].muleqI()); //return J-Yi
   }
   
   private static Complex besselJ_taylor(Complex a, Complex z, int stop) { //approximates the Bessel J function w/ a Taylor's series
-    if(a.isInt() && a.re<0) {
-      return besselJ_taylor(a.neg(),z,stop).muleq(a.re%2==0 ? 1 : -1); //if a is an integer, and the real part is negative, we can 
+    
+    if(a.isInt() && a.re<0) { //special case: a is a negative integer
+      return besselJ_taylor(a.neg(),z,stop).muleq(a.re%2==0 ? 1 : -1); //J(a,z) = (-1)^a*J(-a,z)d
     }
     
-    Complex sum = zero();
-    Complex term = (z.mul(0.5)).pow(a);
-    term.diveq(factorial(a));
-    Complex mul = z.mul(0.5).sq().negeq();
-    for(int m=0;m<=stop;m++) {
-      sum.addeq(term);
-      term.muleq(mul).diveq(a.add(m+1).mul(m+1));
+    Complex sum = zero();               //the sum
+    Complex term = (z.mul(0.5)).pow(a); //each term in the summation
+    term.diveq(factorial(a));           //initially just (z/2)^a/a!
+    Complex mul = z.mul(0.5).sq().negeq(); //one of the things the term multiplies by each iteration, -z^2/4
+    for(int m=0;m<=stop;m++) { //loop through all terms in the sum
+      sum.addeq(term);         //add each term
+      term.muleq(mul).diveq(a.add(m+1).mul(m+1)); //update to the next term = (-1)^m(z/2)^(2m+a)/(m!(a+m)!)
     }
-    return sum;
+    return sum; //return result
+  }
+  
+  private static Complex[] besselJY_taylor(Complex a, Complex z, int stop) { //approximates the Bessel J and Y functions w/ a power series
+    if(a.isInt()) { //special case: if a is an integer:
+      return besselJY_taylor((int)a.re, z, stop); //use the specialized function for when a is an integer
+    }
+    
+    //otherwise, we compute Y(a,z) as (J(a,z)cos(pi*a)-J(-a,z))/sin(pi*a)
+    Complex[] trig = a.mul(Math.PI).fsincos(); //find sin and cos of pi*a
+    
+    Complex sum1 = zero(), sum2 = zero(); //these store both sums to make both bessel J functions
+    Complex term1 = (z.mul(0.5)).pow(a).diveq(factorial(a));      //each term in each summation, initially just (z/2)^(+-a)/((+-a)!)
+    //Complex term2 = (z.mul(0.5)).pow(a.neg()).diveq(factorial(a.neg())); //TODO have this term be solved in terms of the other term
+    Complex term2 = trig[0].div(mul(Math.PI,term1,a));            //however, using reflection rules, we can solve for the second one in terms of the first, making this slightly faster
+    Complex mul = z.mul(0.5).sq().negeq(); //one of the things both terms multiply by each iteration, -z^2/4
+    for(int m=0;m<=stop;m++) { //loop through all terms in the sum
+      sum1.addeq(term1);       //add up each term
+      sum2.addeq(term2);
+      
+      term1.muleq(mul).diveq(add(m+1,a).mul(m+1)); //update to the next term = (-1)^m(z/2)^(2m+-a)/(m!(m+-a)!)
+      term2.muleq(mul).diveq(sub(m+1,a).mul(m+1));
+    }
+    
+    //return besselJ_taylor(a,z,stop).mul(trig[1]).subeq(besselJ_taylor(a.neg(),z,stop)).diveq(trig[0]); //do this
+    return new Complex[] {sum1, sum1.mul(trig[1]).subeq(sum2).diveq(trig[0])}; //lastly, plug in all the stuff and return J and Y
+  }
+  
+  private static Complex[] besselJY_taylor(int a, Complex z, int stop) {
+    if(a<0) {
+      Complex[] result = besselJY_taylor(-a,z,stop); //a is negative: negate a,
+      if((a&1)==1) { result[0].negeq(); result[1].negeq(); } //multiply by (-1)^a
+      return result; //return the result
+    }
+    
+    //to compute the Bessel Y function, we have to compute 3 sums and add/subtract them together
+    
+    Complex termInit = z.mul(0.5).pow(a).diveq(factorial(a)); //First, let's compute this. Trust me, it'll save us on powers and, more importantly, gamma functions
+    
+    //first, we compute the sum of a bunch of terms with negative powers:
+    //(well, the powers aren't all negative, these are just powers less than a)
+    Complex sum1 = zero();          //the sum itself
+    Complex term = termInit.mul(a); //the term
+    Complex mul = div(4,z.sq()); //one of the things the term multiplies by each time
+    term.muleq(mul);             //initialize the term to (z/2)^(a-2)/(a-1)!
+    for(int k=0;k<a;k++) { //loop through all a terms
+      sum1.addeq(term);                      //add each term in the series
+      term.muleq((k+1)*(a-k-1)).muleq(mul); //update each term, should be (z/2)^(a-2k-2) * k!/(a-k-1)!
+    }
+    
+    //finally, the last 2 sums:
+    Complex sum2 = zero(); //a sum of powers >= a
+    Complex j    = zero(); //and a sum of powers >= a, multiplied by ln(z/2). This will be the same as 2J(a,z)ln(z/2)
+    
+    term = termInit;               //the term, initialized to (z/2)^a/a!
+    mul = z.mul(0.5).sq().negeq(); //part of what we multiply by each time, -z^2/4
+    double harmonic = -2*GAMMA;    //and, the sum of two harmonic series, each of which get initialized to -gamma because that's just how it works
+    for(int k=1;k<=a;k++) { harmonic += 1d/k; } //initialize the harmonic series term
+    
+    for(int m=0;m<=stop;m++) { //loop through the infinite remaining iterations until we reach the point at which we agreed to stop
+      sum2.addeq(term.mul(harmonic));  //each iteration, the sum adds the term times the harmonic sum
+      j.addeq(term);                   //meanwhile, the J sum just adds the term bare butt
+      
+      double inv = 1d/((m+1)*(a+m+1)); //precompute a reciprocal to save on divisions
+      term.muleq(mul).muleq(inv);      //each iteration, the term = (-1)^m*(z/2)^(2m+a)/(m!(a+m)!), so we multiply by -(z/2)^2 / ((m+1)(a+m+1)
+      harmonic += (a+2*m+2)*inv;       //each iteration, the harmonic sum = digamma(m+1)+digamma(a+m+1), so we add 1/(m+1)+1/(a+m+1) = (a+2m+2)/((m+1)(a+m+1))
+    }
+    
+    Complex y = j.mul(z.mul(0.5).ln()).muleq(2) .subeq(sum1).subeq(sum2).diveq(Math.PI); //multiply the j term by the 2ln(z/2), then combine the 3 sums and divide by pi
+    
+    return new Complex[] {j,y}; //return the resulting j and y
   }
   
   private static Complex besselJ_asymp(Complex a, Complex z, int stop) { //approximates the Bessel J function w/ an asymptotic series
     if(z.re<0) { //if the real part is negative:
-      return besselJ_asymp(a,z.neg(),stop).muleq(new Complex(-1).pow(z.im>=0?a:a.neg())); //compute this on -z, then apply a simple reflection formula
+      //reflection formula: J(a,z) = J(a,-z)*(-1)^+-a, where +-1 is csgn(z/i)
+      Complex j = besselJ_asymp(a,z.neg(),stop);             //compute this on -z
+      if(a.isInt()) { return a.re%2==0 ? j : j.neg(); }      //if integer, the reflection is simple
+      return j.muleq(exp(a.mulI(z.im>=0?Math.PI:-Math.PI))); //otherwise, (-1)^a isn't as simple
     }
     
-    Complex inv = z.inv(); //compute the reciprocal
+    Complex inv = z.inv(); //compute 1/z
     Complex[] trig = z.sub(a.mul(0.5).addeq(0.25).muleq(Math.PI)).fsincos(); //compute sine and cosine of z-(2a+1)π/4
-    Complex[] pq = besselPQ(a,inv,stop); //compute the bessel P and Q functions
+    Complex[] pq = besselPQ(a,inv,stop); //compute the Bessel P and Q functions
     return trig[1].muleq(pq[0]).subeq(trig[0].muleq(pq[1])).muleq(sqrt(inv.div(HALFPI))); //finally, take (cos*P-sin*Q)*√(2/(πz))
   }
   
   private static Complex besselY_asymp(Complex a, Complex z, int stop) { //approximates the Bessel Y function w/ an asymptotic series
-    //if there's a reflection formula, we might want to use it right here
+    if(z.re<0) { //if the real part is negative:
+      //reflection formula: Y(a,z) = Y(a,-z)*(-1)^-+a +- 2i*cos(pi*a)*J(a,-z), where +-1 is csgn(z/i)
+      
+      Complex inv = z.inv().negeq(); //compute -1/z
+      Complex[] trig = z.add(a.mul(0.5).addeq(0.25).muleq(Math.PI)).negeq().fsincos(); //compute the sine and cosine of -z-(2a+1)π/4
+      Complex[] trig2 = a.mul(Math.PI).fsincos();                                      //also compute the sine and cosine of πa
+      Complex[] pq = besselPQ(a,inv,stop); //compute the Bessel P and Q functions
+      int csgn = z.im>=0 ? 1 : -1;         //compute csgn(z/i)
+      
+      Complex y = pq[0].mul(trig[0]).addeq(pq[1].mul(trig[1])); //compute Y (ignoring the (pi/2*z)^(-1/2) term)
+      Complex j = pq[0].mul(trig[1]).subeq(pq[1].mul(trig[0])); //compute J
+      return y.muleq(trig2[1].sub(trig2[0].mulI(csgn))) .addeq(mul(j, new Complex(0,2*csgn),trig2[1])) .muleq(sqrt(inv.div(HALFPI))); //return y*(-1)^(-+a) +- j*2icos (making sure to include the (pi/2*z)^(-1/2) term)
+    }
     
-    Complex inv = z.inv(); //compute the reciprocal
-    Complex[] trig = z.sub(a.mul(0.5).addeq(0.25).muleq(Math.PI)).fsincos(); //compute the sine and cosine of z-(2a+1)π/4
-    Complex[] pq = besselPQ(a,inv,stop); //compute the bessel P and Q functions
+    //otherwise, we evaluate it normally
+    Complex inv = z.inv(); //compute 1/z
+    Complex[] trig = z.sub(a.mul(0.5).addeq(0.25).muleq(Math.PI)).fsincos(); //compute sine and cosine of z-(2a+1)π/4
+    Complex[] pq = besselPQ(a,inv,stop); //compute the Bessel P and Q functions
     return trig[0].muleq(pq[0]).addeq(trig[1].muleq(pq[1])).muleq(sqrt(inv.div(HALFPI))); //finally, take (sin*P+cos*Q)*√(2/(πz))
+  }
+  
+  private static Complex[] besselJY_asymp(Complex a, Complex z, int stop) { //approximates both Bessel functions w/ an asymptotic series
+    if(z.re<0) { //if the real part is negative:
+      //reflection formula: Y(a,z) = Y(a,-z)*(-1)^-+a +- 2i*cos(pi*a)*J(a,-z), where +-1 is csgn(z/i)
+      
+      Complex inv = z.inv().negeq(); //compute -1/z
+      Complex[] trig = z.add(a.mul(0.5).addeq(0.25).muleq(Math.PI)).negeq().fsincos(); //compute the sine and cosine of -z-(2a+1)π/4
+      Complex[] trig2;
+      if(a.isInt()) { trig2 = new Complex[] {zero(), new Complex(a.re%2==0?1:-1)}; }
+      else          { trig2 = a.mul(Math.PI).fsincos();                            }   //also compute the sine and cosine of πa
+      Complex[] pq = besselPQ(a,inv,stop); //compute the Bessel P and Q functions
+      int csgn = z.im>=0 ? 1 : -1;         //compute csgn(z/i)
+      
+      Complex y = pq[0].mul(trig[0]).addeq(pq[1].mul(trig[1])); //compute Y (ignoring the (pi/2*z)^(-1/2) term)
+      Complex j = pq[0].mul(trig[1]).subeq(pq[1].mul(trig[0])); //compute J
+      Complex root = sqrt(inv.div(HALFPI));                     //compute the square root term
+      return new Complex[] {mul(j, trig2[1].add(trig2[0].mulI(csgn)), root),
+                            y.mul(trig2[1].sub(trig2[0].mulI(csgn))) .addeq(mul(j, new Complex(0,2*csgn),trig2[1])) .muleq(root)};
+      //return  j*(-1)^(+-a)  and  y*(-1)^(-+a) +- j*2icos
+    }
+    
+    //otherwise, we evaluate it normally
+    Complex inv = z.inv(); //compute 1/z
+    Complex[] trig = z.sub(a.mul(0.5).addeq(0.25).muleq(Math.PI)).fsincos(); //compute sine and cosine of z-(2a+1)π/4
+    Complex[] pq = besselPQ(a,inv,stop); //compute the Bessel P and Q functions
+    Complex root = sqrt(inv.div(HALFPI)); //compute the square root term
+    return new Complex[] {trig[1].mul(pq[0]).subeq(trig[0].mul(pq[1])).muleq(root),
+                          trig[0].mul(pq[0]).addeq(trig[1].mul(pq[1])).muleq(root)};
+    //finally, return (cos*P-sin*Q)*√(2/(πz)) and (sin*P+cos*Q)*√(2/(πz))
   }
   
   private static Complex[] besselPQ(Complex a, Complex inv, int stop) { //both supplementary functions used to construct the asymptotic series
@@ -907,4 +1057,58 @@ static double stirling2(int n, int k) { //gets the stirling number of the second
 
 static long modPow(long a, long b, long m) { //computes a to the b modulo m
   return BigInteger.valueOf(a).modPow(BigInteger.valueOf(b), BigInteger.valueOf(m)).longValue();
+}
+
+static long modMult(long a, long b, long m) { //computes a * b mod m
+  return BigInteger.valueOf(a).multiply(BigInteger.valueOf(b)).mod(BigInteger.valueOf(m)).longValue();
+}
+
+static Long discLog_babyGiant(long base, long num, long mod, long phi) {
+  
+  HashMap<Long,Long> powMap = new HashMap<Long,Long>();
+  
+  long root1 = (long)Math.round(Math.sqrt(phi));    //the size of the big step
+  long root2 = (phi+root1-1)/root1; //the number of big steps in the cycle (rounded up)
+  
+  //first, we populate the power map with powers
+  long bigStep = modPow(base,root1,mod);
+  long pow = 1;
+  for(long n=0;n<root2;n++) {
+    powMap.put(pow,n);
+    pow = modMult(pow,bigStep,mod);
+  }
+  
+  long inv = modInv(base,mod);
+  for(int n=0;n<root1;n++) {
+    Long exp = powMap.get(num);
+    if(exp!=null) { return root1*exp+n; }
+    
+    num = modMult(num,inv,mod);
+  }
+  
+  return null;
+}
+
+static long carmichael(long inp) {
+  PrimeFactorization factor = new PrimeFactorization(inp); //compute the prime factorization
+  
+  BigInteger tot = BigInteger.ONE;
+  for(java.util.Map.Entry<Long,Integer> entry : factor.factors.entrySet()) { //loop through all prime factors
+    long prime = entry.getKey(), pow = entry.getValue(); //get the prime and the exponent
+    
+    long term;
+    if(prime==-1) { continue; }
+    else if(prime==2) {
+      if(pow>=3) { term = 1<<(pow-2); }
+      else       { term = 1<<(pow-1); }
+    }
+    else {
+      term = BigInteger.valueOf(prime).pow((int)(pow-1)).longValue()*(prime-1);
+    }
+    
+    tot = tot.multiply(BigInteger.valueOf(term)).divide(tot.gcd(BigInteger.valueOf(term)));
+    
+  }
+  
+  return tot.longValue();
 }

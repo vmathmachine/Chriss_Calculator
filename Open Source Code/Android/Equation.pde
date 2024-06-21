@@ -121,7 +121,12 @@ public static class Equation implements Iterable<Entry> {
   }
   
   private static boolean parenthesesMatch(String a, String b) { //assuming a is a left parenthesis/left function, and b is a right parenthesis (of some kind), this function tells us if b is allowed to close a
-    return a.equals("[") == b.equals("]"); //for now, the only rule is that (a is [) XNOR (b is ])
+    //return a.equals("[") == b.equals("]"); //for now, the only rule is that (a is [) XNOR (b is ])
+    switch(a) {
+      case "[": return b.equals("]");
+      case "{": return b.equals("}");
+      default : return true;
+    }
   }
   
   
@@ -418,7 +423,7 @@ public static class Equation implements Iterable<Entry> {
       case "&&": case "||":                                                        return new int[] {1}; //&& and ||: link 0 is input 1 (not input 0)
       case "Σ(": case "Sigma(": case "Π(": case "Pi(": case "AND(": case "OR(":    return new int[] {0,3}; //sum and product: link 0 is input 0, link 1 is input 3 (variable, start, end, equation)
       case "plug(": case "d/dx(": case "d²/dx²(": case "d^2/dx^2(": case "limit(": return new int[] {0,2}; //plug, derivatives: link 0 is input 0, link 1 is input 2 (variable, value, equation [epsilon] [method])
-      case "BuildVec(":                                                            return new int[] {1,2}; //build vector: link 0 is input 1, link 1 is input 2 (size, variable, equation for each element)
+      case "BuildVec(": case "BuildArray(":                                        return new int[] {1,2}; //build vector: link 0 is input 1, link 1 is input 2 (size, variable, equation for each element)
       case "dⁿ/dxⁿ(": case "d^n/dx^n(":                                            return new int[] {1,3}; //n-th derivative: link 0 is input 1, link 1 is input 3 (n, variable, value, equation [epsilon] [method])
       case "∫(": case "Integral(":                                                 return new int[] {0,3}; //integral: link 0 is input 0, link 1 is input 3 (variable, start, end, equation [samples] [method])
       case "Secant(":                                                              return new int[] {0,3}; //Secant method: link 0 is input 0, link 1 is input 3 (variable, x0, x1, equation)

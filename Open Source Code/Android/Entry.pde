@@ -55,7 +55,7 @@ public static class Entry {
     if(isDouble) { return EntryType.NUM; } //can be cast to double: numeral type
     if(i.length()==1 && Character.isLetter(i.charAt(0))) { return EntryType.CONST; } //is a letter: constant type
     for(String s : Equation.varList) { if(s.equals(i)) { return EntryType.CONST; } } //is part of the variable list: constant type
-    if(!i.equals("(") && i.charAt(i.length()-1)=='(' || i.equals("[")) { return EntryType.LFUNC; } //ends in left parenthesis (or is left bracket): left function type
+    if(!i.equals("(") && i.charAt(i.length()-1)=='(' || i.equals("[") || i.equals("{")) { return EntryType.LFUNC; } //ends in left parenthesis (or is left bracket/curly brace): left function type
     
     for(String m : Month.matchers) { //try to see if this is a date
       if(i.startsWith(m)) { return EntryType.CONST; } //if it begins with a date, it's a "number"
@@ -69,7 +69,7 @@ public static class Entry {
       case "?:": case "\\": case "_":                                return EntryType.LASSOP; //these are all left associative operators
       case "^": case "?":                                            return EntryType.RASSOP; //^, ? are right associative operators
       case "(":                                                      return EntryType.LPAR;   //(: left parenthesis
-      case ")": case "]":                                            return EntryType.RPAR;   //): right parenthesis
+      case ")": case "]": case "}":                                  return EntryType.RPAR;   //): right parenthesis
       case "²": case "³": case "!":                                  return EntryType.RUNOP;  //right function type
       case "(-)": case "~":                                          return EntryType.LUNOP;  //left unary operator
       case ",":                                                      return EntryType.COMMA;  //comma

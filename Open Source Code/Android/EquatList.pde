@@ -14,13 +14,6 @@ public static class EquatList { //a class for holding the list of equations to b
   Mmio mmio; //the mmio system we're apart of
   
   Panel holder2D, holder3D, bigHolder; //a panel for holding the 2D equation list, one for the 3D equation list, and one to hold whichever one is visible, plus all its buttons
-  //ArrayList<Textbox> equations = new ArrayList<Textbox>(); // a list of all the equations to graph out, as textboxes
-  /*ArrayList<Panel> equatPans2D = new ArrayList<Panel>(), //a list of all the equations to graph out, as panels, both in 2D
-                   equatPans3D = new ArrayList<Panel>(); //and in 3D
-  ArrayList<Graphable> plots2D = new ArrayList<Graphable>(), // a list of all the graphable 2D equations
-                       plots3D = new ArrayList<Graphable>(); // a list of all the graphable 3D equations
-  ArrayList<String> cancels2D = new ArrayList<String>(), // backups of what the 2D equations were last time we saved, in case we want to cancel
-                    cancels3D = new ArrayList<String>(); // same thing, but for 3D equations*/
   
   ArrayList<EquatField> equats2D = new ArrayList<EquatField>(), //all our 2D equations
                         equats3D = new ArrayList<EquatField>(); //all our 3D equations
@@ -213,7 +206,9 @@ public static class EquatList { //a class for holding the list of equations to b
     final Panel pan = (Panel)new Panel(0,y,bigHolder.w,equationHeight).setSurfaceFill(0).setStroke(#00FFFF).setParent(getHolder(dim)); //declare new panel for us to put our equation in
     pan.setScrollable(false,false).setDragMode(DragMode.NONE,DragMode.NONE); //make it impossible to scroll or drag
     
-    final Textbox tbox = givePanelEquation(pan, dim, text); //give us an equation textbox to type into
+    float xOffset = mmio.getTextWidth("y=",Mmio.invTextHeight(equationHeight-2*Mmio.yBuff));
+    final Textbox tbox = givePanelEquation(pan, dim, text, xOffset); //give us an equation textbox to type into
+    tbox.setMargin(relativeMarginWidth*mmio.w);                      //give us a sizable margin to make it easier to move the cursor
     
     float offset2 = 0.027272727*bigHolder.w, offset3 = 0.044444444*bigHolder.w, offsetY = 0.048888889*bigHolder.h, offsetY2 = -0.01*bigHolder.h; //constants for initialization
     pan.setText(new Text(mode.outVar()+"=",pan.xSpace,tbox.ty,tbox.tSize,#00FFFF,LEFT,TOP),             //provide the y= at the beginning
@@ -222,7 +217,7 @@ public static class EquatList { //a class for holding the list of equations to b
     
     Graphable grapher = new Graphable(stroke,new Equation(new ParseList(""))); //load empty graphable
     grapher.setMode(mode); //set its mode
-    if(dim) { grapher.setSteps(80); } //to stop this from breaking, set it to 80 steps TODO remove when graphing is optimized
+    if(dim) { grapher.setSteps(80); } //to stop this from breaking, set 3D functions to 80 steps TODO remove when graphing is optimized
     
     final EquatField result = new EquatField(pan, tbox, grapher, ""); //create equation field with the correct panel, textbox, graphable, and an empty cancel string
     
@@ -240,9 +235,8 @@ public static class EquatList { //a class for holding the list of equations to b
     return result; //return our result
   }
   
-  Textbox givePanelEquation(Panel pan, boolean dim, String text) { //takes a panel and gives it an equation
-    float offset = 0.1*bigHolder.w; //constant for initialization
-    final Textbox tbox = new Textbox(offset,0,getHolder(dim).w-offset,equationHeight).setCursorColor(#00FFFF).setTextColor(#00FFFF); //declare textbox for us to type our equation in
+  Textbox givePanelEquation(Panel pan, boolean dim, String text, float xOffset) { //takes a panel and gives it an equation
+    final Textbox tbox = new Textbox(xOffset,0,getHolder(dim).w-xOffset,equationHeight).setCursorColor(#00FFFF).setTextColor(#00FFFF); //declare textbox for us to type our equation in
     tbox.setSurfaceFill(0).setStroke(false).setParent(pan); tbox.setScrollable(false,false).setDragMode(DragMode.ANDROID,DragMode.NONE); //make it move like a mobile phone
     tbox.setTextPosAndAdjust(buffX,buffY); tbox.setCursorThick(cursorThick); //TODO see if this is messing up our alignment
     

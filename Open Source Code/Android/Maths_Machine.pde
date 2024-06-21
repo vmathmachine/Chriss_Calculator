@@ -80,6 +80,10 @@ boolean isMainCanvas = false;
 boolean draw2Active=false; //boolean to store whether draw2 is active
 byte keyPressedActive=0; //byte to store how many instances of keyPressed are active
 
+static char dirChar = '/';
+
+final static float relativeMarginWidth = 0.037;
+
 void settings() {
   
   DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();

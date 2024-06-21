@@ -8,21 +8,21 @@ enum GraphMode {
   int outs() { return this==PARAMETRIC2D ? 2 : this==PARAMETRIC3D ? 3 : 1; }
   
   String[] inputs() { switch(this) {
-    case RECT2D: return new String[] {"x"};
-    case POLAR: return new String[] {"θ"};
+    case RECT2D:       return new String[] {"x"};
+    case POLAR:        return new String[] {"θ"};
     case PARAMETRIC2D: return new String[] {"t"};
-    case RECT3D: return new String[] {"x","y"};
-    case CYLINDRICAL: return new String[] {"θ","r"};
-    case SPHERICAL: return new String[] {"θ","φ"};
+    case RECT3D:       return new String[] {"x","y"};
+    case CYLINDRICAL:  return new String[] {"θ","r"};
+    case SPHERICAL:    return new String[] {"θ","φ"};
     case PARAMETRIC3D: return new String[] {"t","u"};
-    default: return new String[0];
+    default:           return new String[0];
   } }
   
   String outVar() { switch(this) {
     case RECT2D: return "y";
-    case POLAR: return "r";
+    case POLAR:  return "r";
     case PARAMETRIC2D: case PARAMETRIC3D: return "v";
-    case RECT3D: case CYLINDRICAL: return "z";
+    case RECT3D:       case CYLINDRICAL:  return "z";
     case SPHERICAL: return "ρ";
     default: return null;
   } }

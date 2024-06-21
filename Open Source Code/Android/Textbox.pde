@@ -47,6 +47,13 @@ public static class Textbox extends Panel {
   Textbox setTextSize   (float siz) { tSize=siz; return this; }
   Textbox setTextSizeAndAdjust(float siz) { tSize=siz; ty=0.5*(h-Mmio.getTextHeight(siz)); ySpace=min(ySpace,ty); return this; }
   
+  Textbox setMargin(float x) { //sets the margin between the text & the left & right (AKA the xSpace)
+    xSpace = x;       //set the x space
+    setTextX(xSpace); //change the text x
+    adjust();         //adjust it
+    return this;      //return result
+  }
+  
   @Override
   Textbox setW(final float w2) { super.setW(w2); buddy.setW(w2); return this; } //when resizing width, the buddy must be resized as well
   

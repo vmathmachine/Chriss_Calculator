@@ -145,7 +145,7 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   } }),
   new MathFunc("//","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.div(inp[1].number).floor()); } }),
   
-  new MathFunc("=","..",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //next, inequalities
+  /*new MathFunc("=","..",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //next, inequalities
     if(inp[0].type==inp[1].type) { switch(inp[0].type) {
       case COMPLEX: return new MathObj(inp[0].number.equals(inp[1].number));
       case BOOLEAN: return new MathObj(inp[0].bool == inp[1].bool);
@@ -169,7 +169,10 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
       default: return new MathObj(true);
     } }
     else { return new MathObj(true); }
-  } }),
+  } }),*/
+  new MathFunc("=","..",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].equals(inp[1])); } }),
+  new MathFunc("==","..",tempFunc),
+  new MathFunc("!=","..",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(!inp[0].equals(inp[1])); } }),
   new MathFunc("<" ,"cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.re<inp[1].number.re || inp[0].number.re==inp[1].number.re && inp[0].number.im< inp[1].number.im); } }),
   new MathFunc(">" ,"cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.re>inp[1].number.re || inp[0].number.re==inp[1].number.re && inp[0].number.im> inp[1].number.im); } }),
   new MathFunc("<=","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.re<inp[1].number.re || inp[0].number.re==inp[1].number.re && inp[0].number.im<=inp[1].number.im); } }),
@@ -326,6 +329,12 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("det(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.determinant()); } }),
   new MathFunc("eigenvalues(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(new CVector(inp[0].matrix.eigenvalues())); } }),
   new MathFunc("eigenvectors(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(new CMatrix(inp[0].matrix.eigenvectors())); } }),
+  new MathFunc("eigenboth(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    Object[] both = inp[0].matrix.eigenvalues_and_vectors();
+    CVector vals = new CVector((Complex[])both[0]);
+    CMatrix vecs = new CMatrix((CVector[])both[1]);
+    return new MathObj(new MathObj(vals), new MathObj(vecs));
+  } }),
   
   new MathFunc("√(","m",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.sqrt()); } }),
   new MathFunc("sqrt(","m",tempFunc),
@@ -359,6 +368,18 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("Γ(","m",tempFunc=new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.sub(1).factorial()); } }),
   new MathFunc("Gamma(","m",tempFunc),
   
+  new MathFunc("{",".*",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    return new MathObj(inp);
+  } }),
+  new MathFunc("size(","a",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    return new MathObj(inp[0].array.length);
+  } }),
+  new MathFunc("_","ac",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    if(inp[1].number.isWhole() && inp[1].number.re<inp[0].array.length) {
+      return inp[0].array[(int)inp[1].number.re];
+    }
+    return new MathObj("Error: cannot take index "+inp[1].number+" of array["+inp[0].array.length+"]");
+  } }),
   
   new MathFunc("+","dc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //date functions
     if(inp[1].number.isInt()) { return new MathObj(inp[0].date.add((long)inp[1].number.re)); }
@@ -553,9 +574,13 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("EllipticE(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.incompleteE(inp[0].number,inp[1].number)); } }),
   new MathFunc("EllipticΠ(","cc",tempFunc=new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.completePI(inp[0].number,inp[1].number)); } }), new MathFunc("EllipticPI(","cc",tempFunc),
   
-  new MathFunc("BesselJ(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
-    return new MathObj(Cpx3.besselJ(inp[0].number, inp[1].number));
-  } }),
+  new MathFunc("BesselJ(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselJ(inp[0].number, inp[1].number)); } }),
+  new MathFunc("BesselY(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselY(inp[0].number, inp[1].number)); } }),
+  new MathFunc("BesselJY(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(new CVector(Cpx3.besselJY(inp[0].number, inp[1].number))); } }),
+  new MathFunc("BesselI(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselI(inp[0].number, inp[1].number)); } }),
+  new MathFunc("BesselK(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselK(inp[0].number, inp[1].number)); } }),
+  new MathFunc("BesselH1(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselH1(inp[0].number, inp[1].number)); } }),
+  new MathFunc("BesselH2(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.besselH2(inp[0].number, inp[1].number)); } }),
   
   new MathFunc("Factor(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //factoring
     Complex num = inp[0].number; //grab input
@@ -632,6 +657,20 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
     }
     return new MathObj(modPow(Math.round(inp[0].number.re),Math.round(inp[1].number.re),Math.round(inp[2].number.re)));
   } }),
+  new MathFunc("discLog(","ccc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    if(!inp[0].number.isInt() || !inp[1].number.isInt() || !inp[2].number.isInt()) { //all 3 inputs must be integers
+      return new MathObj("Cannot take log_"+inp[0].number+"("+inp[1].number+") mod "+inp[2].number+" (must all be integers)");
+    }
+    Long log = discLog_babyGiant((long)inp[0].number.re, (long)inp[1].number.re, (long)inp[2].number.re, carmichael((long)inp[2].number.re));
+    if(log==null) { return new MathObj("Logarithm does not exist"); }
+    else          { return new MathObj(new Complex(log)); }
+  } }),
+  new MathFunc("carmichael(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    if(!inp[0].number.isInt()) { //input must be an integer
+      return new MathObj("Cannot take Carmichael's totient of "+inp[0].number+" (must be an integer)");
+    }
+    return new MathObj(carmichael(Math.round(inp[0].number.re)));
+  } }),
   
   
   ////////////// RECURSIVE FUNCTIONS //////////////////////
@@ -659,6 +698,23 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
       return new MathObj(new CVector(arr)); //now that all the elements are created, return the result
     }
     else { return new MathObj("Cannot build vector of size "+inp[0]); } //if not a whole integer, return error message
+  } }),
+  
+  new MathFunc("BuildArray(","cee",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //size, variable, equation
+    String vari = inp[1].equation.tokens.get(0).id; //record the variable we're plugging into
+    HashMap<String, MathObj> map2 = (HashMap<String,MathObj>)map.clone(); //clone the map
+    
+    if(inp[0].isNum() && inp[0].number.isWhole()) { //if the size is a whole integer
+      int siz = (int)inp[0].number.re;  //record the size of the array
+      MathObj[] arr = new MathObj[siz]; //create array of appropriate length
+      for(int n=0;n<siz;n++) {                         //loop through all elements of the array
+        map2.put(vari, new MathObj(new Complex(n)));   //set the variable to our current index
+        MathObj term = inp[2].equation.solve(map2);    //solve at this index
+        arr[n] = term;                                 //set this element
+      }
+      return new MathObj(arr); //now that all the elements are created, return the result
+    }
+    else { return new MathObj("Cannot build array of size "+inp[0]); } //if not a whole integer, return error message
   } }),
   
   new MathFunc("BuildMat1(","cceee",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { //height, width, row var, column var, scalar equation
@@ -1285,8 +1341,8 @@ static class SimplePattern { //a class which compactifies & speeds up regex expr
   int size() { return min.length; } //returns the number of entries in this
   
   //used to map characters/variable types to bytes
-  static HashMap<Character, Byte> cMatcher = new HashMap<Character, Byte>() {{ put('b',(byte)0); put('c',(byte)1); put('v',(byte)2); put('m',(byte)3); put('d',(byte)4); put('e',(byte)5); put('M',(byte)6); put('N',(byte)7); }};
-  static EnumMap<MathObj.VarType, Byte> vMatcher = new EnumMap<MathObj.VarType, Byte>(MathObj.VarType.class) {{ put(MathObj.VarType.BOOLEAN,(byte)0); put(MathObj.VarType.COMPLEX,(byte)1); put(MathObj.VarType.VECTOR,(byte)2); put(MathObj.VarType.MATRIX,(byte)3); put(MathObj.VarType.DATE,(byte)4); put(MathObj.VarType.EQUATION,(byte)5); put(MathObj.VarType.MESSAGE,(byte)6); put(MathObj.VarType.NONE,(byte)7); }};
+  static HashMap<Character, Byte> cMatcher = new HashMap<Character, Byte>() {{ put('b',(byte)0); put('c',(byte)1); put('v',(byte)2); put('m',(byte)3); put('d',(byte)4); put('a',(byte)5); put('e',(byte)6); put('M',(byte)7); put('N',(byte)8); }};
+  static EnumMap<MathObj.VarType, Byte> vMatcher = new EnumMap<MathObj.VarType, Byte>(MathObj.VarType.class) {{ put(MathObj.VarType.BOOLEAN,(byte)0); put(MathObj.VarType.COMPLEX,(byte)1); put(MathObj.VarType.VECTOR,(byte)2); put(MathObj.VarType.MATRIX,(byte)3); put(MathObj.VarType.DATE,(byte)4); put(MathObj.VarType.ARRAY,(byte)5); put(MathObj.VarType.EQUATION,(byte)6); put(MathObj.VarType.MESSAGE,(byte)7); put(MathObj.VarType.NONE,(byte)8); }};
   
   SimplePattern(String r) { //compiles a regex string into a simple pattern
     ArrayList<Short> cpat = new ArrayList<Short>(), min2 = new ArrayList<Short>(), max2 = new ArrayList<Short>(); //arraylists to store everything
