@@ -1,13 +1,7 @@
-Here's what changed:
+Text selection through highlighting was added. Double tap text to highlight it (which also brings up the text selection menu), triple tap to bring up the text selection menu w/out highlighting. It is planned that, in the next update, you will also be able to highlight text by way of the press-and-hold gesture.
 
-A HUGE margin was added to the left and right on both the query box and the equation textboxes. This was done to make it easier to move the cursor to the far left or far right.
+A graphing bug was fixed. The bug being that certain discontinuous functions, such as y=e^(1/x), will fail to render parts of it. In the case of e^(1/x), the branch that goes to 0 will intermittently render and then not render. Now, however, it should always render.
 
-A bug was fixed where, if you pressed the backspace, left, or right arrows, but released the buttons without your finger still on the button, it wouldn't update the press counter correctly. This messed up the double tap / multi tap functionality of certain buttons, such as .i or eE, and can in some cases even cause a crash.
+A few extra functions for arrays were also added, such as splicing, searching, etc.
 
-The Bessel Y function was added, as were several supplementary Bessel functions, such as I, K, and the Hankel functions, as well as a function that calculates J and Y at the same time. The correct syntax is BesselJ, BesselY, BesselI, BesselK, BesselH1, BesselH2, and BesselJY.
-
-Arrays were added. To initialize an array, separate the components with commas and wrap the whole thing in {curly brackets}, just like how you do for vectors (but again, use curly brackets). Arrays are similar to vectors and matrices, but their components can be anything: numbers, booleans, vectors, matrices, dates, even other arrays. Or a combination of any of the above, arrays can have mixed components. To grab a specific element of an array, use the _ operator. It should be noted that, unlike vectors and matrices, where the first element has an index of 1 due to longstanding mathematical notation, arrays have 0 as their first index. At some point, I'm thinking of adding an option that lets you change the starting index for vectors, matrices, and/or arrays if you so choose.
-
-The "eigenboth" function was added, which returns the eigenvalues and eigenvectors of a matrix, both wrapped up in an array. This was added because, if you need to know both, calculating both at the same time is faster than calculating one at a time.
-
-Discrete logarithms were added (notation discLog(base, number, modulo)). They currently use the baby step - giant step algorithm, mostly because I don't understand the Pollard Rho algorithm enough to implement it with confidence. The carmichael totient was also added, which can be entered as carmichael.
+The code has also been refactored to generate text quicker and more efficiently.
