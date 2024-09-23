@@ -35,7 +35,7 @@ new version works, you may delete the old "application.linux64" folder and its c
 
 
 
-**Other**
+**Misc**
 
 For detailed information on how to use this application, please check out the manual, "Math Machine Manual.txt".
 
