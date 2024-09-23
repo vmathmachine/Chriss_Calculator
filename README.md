@@ -1,8 +1,9 @@
-###Math's Machine###
+****Math's Machine****
 
 Supported on Android, Windows, and Linux.
 
-##To run on Android:##
+**To run on Android:**
+
 Download "maths_machine_release.apk" to your Android device. Open the downloaded file, allowing you to install it (similar to EXEs on Windows).
 If this is your first time installing an app via an apk file, your phone might issue some sort of warning. Depending on the device (i.e. Samsung, Pixel, etc), it might ask Play Protect to
 scan it, or it might make you press "read more" before pressing "install anyway", or it might outright block you from downloading the app. As long as you trust the developer, you don't have
@@ -13,7 +14,8 @@ To update the app, you download the apk for the most recent version of the app (
 app, you press yes, and it will update. To downgrade the app, you do the same thing, but download the apk for the earlier version you'd like to downgrade to.
 
 
-##To run on Windows (64-bit):##
+**To run on Windows (64-bit):**
+
 Open the folder "Desktop Executables". Download "application.windows64" to your Windows device. Place the folder somewhere secure, where you won't accidentally delete it. Feel free to rename
 it. To open the application, please press "Calculator_5.exe". Feel free to create a shortcut of "Calculator_5.exe" to open and close this whenever you'd like.
 
@@ -22,7 +24,8 @@ To update the app, you download the new version of this application. Then, in th
 your new version works, you may delete the old "application.windows64" folder and its contents.
 
 
-##To run on Linux (64-bit):##
+**To run on Linux (64-bit):**
+
 Open the folder "Desktop Executables". Download "application.linux64" to your Linux device. Place the folder somewhere secure, where you won't accidentally delete it. Feel free to rename it.
 To open the application, please give "Calculator_5" executable permissions and run it. Feel free to create a shortcut that runs the executable file.
 
