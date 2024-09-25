@@ -1,0 +1,490 @@
+Installation/Updating:
+
+Note: The device you're using must run on Android OS (or be an emulator for Android OS). This includes Samsung phones, Google Pixels, the OnePlus, and many others.
+
+From your mobile device, open the Google Drive folder you found this in, "Calculator App (Math's Machine)", look through the folders. Each folder contains a different version of this app, and each folder is named based on when each version was submitted (Month Day Year hour:minute). Click the most recent folder (unless you want to use an older version), and then press the file (it should end in .apk). Open with PackageInstaller. It might warn you about Google not recognizing the developer. Press "more options", and then press "install anyway". The app "Maths_Machine" will now be a part of your app library.
+
+To update the app, or restore it to a previous version, simply go to the folder "Calculator App (Math's Machine)", find the most recent folder (or whichever version you wanna update/restore to). Tap the apk file, open with PackageInstaller, and then when asked if you wanna update the app, select "update".
+
+
+
+
+
+Use:
+
+
+
+There are 3 tabs at the top: Calculator, Equations, and Graph. The Calculator tab is where you type questions and get answers. The Equations tab is where you create equations that can be plotted out. The Graph tab is where you can view the plots of said equations.
+
+Calculator:
+
+The set up is simple. You type in a question, you press the enter key (bottom right), you get an answer. If there were any syntax errors, or if your request was invalid (e.g. cos(true), ln(yesterday)), you'll receive an error message instead of an answer.
+
+Above the query box is your history panel, this is where the past 128 questions and their 128 respective answers are displayed, with the most recent at the bottom, and the oldest at the top. If you'd like to change the number of results displayed, use the function SetHistoryDepth() in the query box (more info in the table of functions). Tapping a previous question puts the contents of said question into the query box, right in front of your cursor. Tapping a previous answer does the same thing, but also wraps the answer in parentheses (in case you tap something like "1+2i").
+
+Information on the keypad and typing in general will be provided later.
+
+
+Equations:
+
+Initially, there should be no equations. Press the "Add" button to add a new equation to the list. Press "Delete" to delete the currently selected equation. Press the enter key on the bottom right to save the currently selected equation.
+
+Since equations cannot be instantaneously parsed and compiled, equations must be saved before they can be graphed. If an equation has a checkmark over the = sign, that means it's been saved (otherwise, it hasn't). If you press enter, and the checkmark doesn't appear, that means there was a syntax error that prevents you from saving. The Equations tab does not yet tell you what your syntax error is like how the Calculator tab does.
+
+More information about editing equations will be provided later.
+
+
+
+Graph:
+
+Here's the graph. Swipe your finger around to move the graph around. To zoom in or out, use a two-fingered pinching motion, moving your fingers closer together to zoom out, farther apart to zoom in.
+
+There are buttons at the bottom. Most of them don't work yet. The "2D" button swaps to 3D mode, the "Reset" button resets the scale and position of the graph.
+
+In 3D mode, you swipe your finger around to rotate the graph around. To zoom in or out, use a two-fingered pinching motion, moving your fingers closer together to zoom out, farther apart to zoom in. The ability to move the graph's position hasn't been implemented yet.
+
+In 3D mode, there are also buttons at the bottom. The "3D" button swaps to 2D mode. The "Reset" button resets position, rotation, and scale. The "Axes"/"Labels"/"None" buttons toggle the display of your 3D axes. "Axes" enables the axes, "Labels" enables the tickmarks (which, because I'm stupid, aren't yet labeled), and "None" disables both. Also, because I'm stupid, you can't yet do this in 2D mode. The "Points"/"Wireframe"/"Surface" buttons change how graphs are shown. "Points" means that all graphs are just shown as a bunch of dots. "Wireframe" means the dots are connected by lines. "Surface" means the dots and lines are connected by triangles. Because the renderer is stupid, Surface mode will often display farther away things in front of closer things. I don't get why. "Trace" and "Max/Min" don't do anything yet.
+
+
+
+
+
+
+
+
+
+More on Equations:
+
+From the Equations tab, the up and down buttons at the top change the order of the equations, moving the selected equation either up or down on the list. If you press the "Visible?" button, it toggles the visibility of the equation in the Graph tab. Greyed out equations aren't graphed, non-greyed out ones are. The "Cancel" button reverts your equation's text to what it was last time you saved, just in case you want to cancel your changes. The "2D" button swaps to the set of 3D equations, and the "3D" button swaps to the set of 2D equations. Don't tell me what to do. The "Mode" button changes the graphing mode for your selected equation. The options in 2D are rectangular, polar, and parametric. The options in 3D are rectangular, cylindrical, spherical, and parametric. Details on how to plot parametric equations will be provided later. The text field on the bottom right will display the color of your graph, using RGB notation. To edit it, simply tap the textbox, start typing, and when you're done, press enter. Your result should be 3 integers from 0-255, separated by commas and with no spaces. If what you typed was invalid, it'll just revert to what it was before. New equations are orange by default.
+
+In case you're unfamiliar with RGB:
+
+red=255,0,0
+orange=255,128,0
+yellow=255,255,0
+lime green=0,255,0
+dark green=0,128,0
+cyan (light blue) = 0,255,255
+blue=0,0,255
+purple=191,0,255
+magenta=255,0,255
+black=0,0,0
+white=255,255,255
+gray=128,128,128
+brown=128,64,0
+peach=255,192,160
+plum=128,0,128
+
+At some point I'll also implement compatibility with hex codes.
+
+
+
+
+
+Advanced Keypad:
+
+The keypad is set up similarly to the standard numpad on many keyboards. More precisely, it's set up like the number pad that accountants use, which is exactly like the traditional numpad, but with a backspace key added at the top right. It should be noted that the - key is used as both minus and the negative sign.
+
+To make the best use of space, many buttons are given special "double tap" functionality. Tapping the period key twice types i (i.e. √(-1)), tapping the * symbol twice types the ^ symbol (for exponents). Additionally, tapping the "e E" key once types e (i.e. 2.7182818...), but tapping it twice types E (used for exponential notation, like in 6.02E23).
+
+If there's something you wanna type, but it's not available on the current keypad, try pressing the 2nd key. If you still don't see what you wanna type, try pressing the down arrow at the bottom left. It'll bring up the on screen keyboard.
+(Note that only ASCII inputs are accepted. If you type characters such as ×, π, γ, θ, •, °, etc., the calculator won't recognize it. I literally have no way to fix this bug. Sorry.)
+
+The C button clears whatever's in the textbox you're typing into (usually either the query box or the selected equation). If you tap it 10 times in a row while in the Calculator tab, it clears your entire history. If you tap it 10 times in a row while in the Equations tab, it deletes all your equations. Don't worry, you almost certainly won't accidentally press it 10 times in a row. If, at any point during the 10 tap sequence, you tap literally any other button, the counter will reset to 0.
+
+The left arrow and right arrow move your cursor left or right. Unlike most keys, the left arrow, right arrow, and backspace key can all be held down to spam their functionality.
+
+If you lose track of how many parentheses you've typed, look at the left parenthesis symbol. It always displays a number showing how many unclosed left parentheses you have. If it's positive, you have too many left parentheses. If it's negative, you have too many right parentheses. Note that even if it's 0, that doesn't necessarily guarantee that all your parentheses are properly closed. For instance, the expression "())(" has just as many left parentheses as right, but since not every right parenthesis comes after its corresponding left parenthesis, it's not valid.
+
+When you press the 2nd key, it changes some of the keys displayed. π and e E become Ans and comma (Ans being the most recent answer). √ and ln become sin and cos. / becomes %. And ( and ) become CTRL+V and CTRL+A+C. It should be noted that text selection is not currently supported because Android SDK can't make anything easy for anyone. So, instead, I manually added a button that lets you paste the contents of the clipboard (CTRL+V) and a button that lets you copy the contents of the entire textbox TO your clipboard (CTRL+A+C). It should also be noted that the % sign does NOT refer to actual percentages, and instead represents the modulo operator. I've been thinking of removing this shortcut.
+
+In the Equations tab, things are a little different. The π key is reutilized to type out the input variable. So, in rectangular, it types x, in polar, it types θ, and in parametric, it types t. If you still wanna type π, just double tap the key. The Ans button has also been replaced with the n key. What does n do? Nothing at the moment, but it'll be very helpful for graphing at a later date.
+
+In 3D mode, it's even more different. Since 3D equations need 2 inputs, the π and e keys have been replaced with the first and second inputs (rectangular = x & y, cylindrical = θ & r, spherical = θ & φ, parametric = t & u). Since this removes the double tap functionality needed to type the E key, the comma key has now also been changed. Now, single tapping it types a comma, while double tapping it types E.
+
+Certain operators also have an additional quirk. The +, *, /, and % operators, when typed into an empty query box, will type that operator, but also type "Ans" before it. So, if you want to add 5 to the previous result, just type + 5 enter. The - key functions similarly. If you tap it once into an empty query box, it just types -, but if you tap it twice, it types Ans-. This is because - also doubles as the negation symbol, and so to prevent people from accidentally typing Ans-5 when they just wanted to type negative 5, an extra step is added.
+
+Spaces can be included in queries or equations. They don't do anything, but it can be helpful if you need to separate things out for readability. To be fair, it doesn't exactly do "nothing", for instance, typing "l n(" isn't the same as typing "ln(". It'll instead interpret the l and n as separate tokens, and since "n(" isn't a function in its function dictionary, it'll just interpret it as "l*n*(". This can be useful if you wanna type 3*4 as "3 4", but also, you have a perfectly good * key right there. Also, this means you can't just splice a space between a function and its parenthesis. Typing "ln (" will be interpreted as "l*n*(", since ln isn't the name of any stored global variable, and since it considers the left parenthesis to be a PART of the function itself.
+
+
+
+
+How to use parametric:
+
+Plain and simple, to graph something like x=3t+7, y=-t-6, you plot it as v=[3t+7,-t-6]. The square brackets can be accessed via the on screen keyboard. In 3D, it's the same, but you have x,y,z instead of x,y.
+
+
+Unlike the other graphing modes, where you have one scalar coordinate that's a function of other scalar coordinate(s), in parametric, the vector position is a function of other scalar(s) that aren't related to the coordinates. Hence why the equation is a vector: it's because the output is a vector.
+
+If you wanna use what's known as "complex parametric", where instead of plotting out the x and y components of a vector function, you plot out the real and imaginary parts of a complex scalar function, you simply enter it in the format:
+
+v=Re(f(t)[1,-i])
+
+
+
+
+Vectors, Matrices, and other datatypes:
+
+This calculator doesn't just work with numbers. On top of supporting complex numbers, it also supports booleans, vectors, matrices, and dates (e.g. January 26, 2003). The vectors and matrices are have complex components, no errors will arise from using complex number operations on them.
+
+To create a boolean, simply type "true" or "false". You can also generate one using equivalent expressions, such as 3<4 (true) or 5<5 (false). A full list of boolean functions is provided in the table later.
+
+To create a vector, simply type a comma separated list between square brackets. So, for instance, [3,4] creates a vector that points 3 to the right and 4 up. To create a matrix, simply type a comma separated list of ROW vectors between square brackets. So, for instance, to create the matrix
+
+1 3 7
+2 1 -5
+
+Simply type [[1,3,7],[2,1,-5]].
+
+To invert a matrix, simply use ^-1. To transpose it, use the function T(. You can multiply matrices by vectors. Matrix*vector will treat the vector as a column matrix, vector*matrix will treat the vector as a row matrix. The full list of vector and matrix functions is provided in the later table.
+
+To create a date, simply type it in the format Month day, year. So, January 7, 2009. Alternatively, the calculator also accepts the shortened 3 letter variants, such as Jan 7, 2009. It also accepts the 4 letter variant of September, Sept. These are case sensitive, though. So, the month must be capitalized, there must be a space between month and day, there must be a comma after day, and there must be a space between the comma and year. You can also omit the comma, space, and year, and it'll assume the year is this year. The constant "today" stores today's date, I'm sure you can guess what "tomorrow" and "yesterday" will return. To find the number of days between two dates, simply subtract them. So, for instance, Jan 7-Jan 3 will return 4. Likewise, you can also add or subtract numbers to or from dates. Jan 7+4 returns January 11, Jan 7-4 returns January 3. The "week(" function returns what day of the week a particular date falls on. Typing a day of the week (capitalized) will return the next time that day of the week happens (unless that day is today, then it returns today). To find when a particular holiday occurs during a particular year, simply enter Holiday_name(year). Not all holidays work. Easter does not currently work since that depends on the phases of the moon, which is difficult to calculate. A full list of date functions is provided in the table of functions, which will be seen later.
+
+Arrays are an important list-like data structure that allows you to store multiple components, regardless of their data type, in one location. They're created using the curly brackets {}. Unlike vectors and matrices, where the first index is index 1, for arrays, the first index is index 0. They're also a fundamental component for programming languages and Turing machine systems (a system capable of executing any algorithm). While this calculator is not yet Turing complete, it will be at a later point, and the addition of arrays is an important componet for this transition.
+
+
+
+
+
+Recursive Functions:
+
+This calculator also supports what are known as "recursive functions", functions such that one or more inputs is another function. An example of this is summation, for which the function name is Sigma( or Σ(. It takes 4 parameters: first the variable name, then the starting index, then the ending index, then the actual function itself. So, for instance, to sum up all numbers from 1 to 100, you'd enter:
+
+Sigma(n,1,100,n)
+
+Or, to sum up 2^0+2^1+2^2+...+2^10, you'd enter:
+
+Sigma(n,0,10,2^n)
+
+There are also several other recursive functions. For instance, the simplest one is "plug(", which simply takes an equation and plugs in a specific value for one of the variables. So, for instance,
+
+plug(k,10,(k+5)/(k-5))
+
+takes the equation (k+5)/(k-5) and plugs in the value for k=10, evaluating to (10+5)/(10-5) = 15/5, thus returning 3. Other useful recursive functions exist, such as ones for root solving, numerical integration, numerical differentiation, and numerically approximating the solution to a differential equation. More details are listed in the table of functions.
+
+
+
+
+
+
+
+
+
+
+
+Table of Functions:
+
+Operators:
+
+Arithmetic:
++: addition (#+#, v+v, m+m, m+#, #+m, d+#, #+d), identity function (+.)
+-: subtraction (#-#, v-v, m-m, m-#, #-m, d-#, d-d), negation (-#, -v, -m)
+*: multiplication (often implied via two adjacent elements) (#*#, #*v, v*#, #*m, m*#, v*m, m*v, m*m)
+/: division, a/b = a*(b^-1) (#/#, v/#, m/#, #/m, v/m, m/m)
+\: left division, a\b = (a^-1)*b (#\#, #\v, #\m, m\#, m\v, m\m)
+//: truncated division, division without remainder, a//b = floor(a/b) (#//#)
+%: modulo, remainder of division, a%b = a-b*(a//b) (#%#)
+**: exponential operator (#**#, m**#, #**m)
+^: exponential operator (#^#, m^#, #^m), logical XOR (b^b)
+²: square (#², m²)
+³: cube (#³, m³)
+
+Inequalities:
+
+=, ==: test for equality, returns true iff both elements equal (.=., .==.)
+!=: test for inequality, returns true iff both elements don't equal (.!=.)
+<: less than (#<#, d<d)
+>: greater than (#>#, d>d)
+<=: less than or equal to (#<=#, d<=d)
+>=: greater than or equal to (#>=#, d>=d)
+
+Boolean:
+!: NOT; logical negation (!b), factorial (#!, m!)
+~: NOT; logical negation (~b)
+&: AND; logical disjunction (b&b)
+&&: AND with short circuit evaluation (b&&b)
+|: OR; logical conjunction (b|b)
+||: OR with short circuit evaluation (b||b)
+^: XOR; logical inequality (b^b), exponential operator (#^#, m^#, #^m)
+?: : ternary operator; piecewise operator (b?.:.), evaluates the boolean expression to the left of the ?. If true, it returns the thing between the ? and :, otherwise, it returns the thing to the right of the :
+
+Vector/Matrix:
+_: Array access operator. It returns the nth element of a vector (as a scalar), the nth row of a matrix (as a vector), or the nth element of an array. Vectors and matrices have their first element be element 1, while arrays have it as element 0. (v_#, m_#, m_#_#)
+•, ●: dot product (v•v)
+×: cross product (v×v)
+
+Other:
+
+!: factorial (#!, m!), NOT; logical negation (!b)
+
+
+
+
+Functions with parentheses:
+
+fp(): Full precision, displays the given mathematical object to its full precision. By default, answers are shown with only 13 decimal places, and large real numbers with small imaginary parts or large imaginary numbers with small real parts usually have their small part omitted. This function overrides this protocol and displays the answer to the same level of precision that the computer is storing it (fp(.))
+
+SetHistoryDepth(): Sets how many of the most recent questions are displayed in the history panel (this is also equal to the number of answers that are displayed). The depth must be an integer between 6 and 5000. (SetHistoryDepth(#))
+
+GetHistoryDepth(): returns the current history depth (GetHistoryDepth())
+
+ulp(): Unit in the last place, the smallest amount a number can be off by in a finite precision environment (i.e. with floating points or with numbers expressed in scientific notation). For example, ulp(2.352*10^15) = 0.001*10^15, or 1.000*10^12. The ulp of a negative number will be positive. The ulp of 0 will be the smallest positive floating point. The ulp of a complex number will either be the ulp of the real or imaginary part, whichever is bigger. ( ulp(#) )
+
+Elementary (non-trig):
+(): identity function ( (.) )
+√(): square root (√(#), √(m), √(m,b*))
+ln(): natural logarithm (ln(#), ln(m), ln(m,#*))
+log(): common logarithm (log(#), log(m))
+
+Trigonometry:
+sin(): sine (sin(#), sin(m))
+cos(): cosine (cos(#), cos(m))
+tan(): tangent (tan(#), tan(m))
+sec(): secant (sec(#), sec(m))
+csc(): cosecant (csc(#), csc(m))
+cot(): cotangent (cot(#), cot(m))
+sinh(): hyperbolic sine (sinh(#), sinh(m))
+cosh(): hyperbolic cosine (cosh(#), cosh(m))
+tanh(): hyperbolic tangent (tanh(#), tanh(m))
+sech(): hyperbolic secant (sech(#), sech(m))
+csch(): hyperbolic cosecant (csch(#), csch(m))
+coth(): hyperbolic cotangent (coth(#), coth(m))
+asin(): arc sine (asin(#), asin(m))
+acos(): arc cosine (acos(#), acos(m))
+atan(): arc tangent (atan(#), atan(m))
+asec(): arc secant (asec(#), asec(m))
+acsc(): arc cosecant (acsc(#), acsc(m))
+acot(): arc cotangent (acot(#), acot(m))
+asinh(): inverse hyperbolic sine (asinh(#), asinh(m))
+acosh(): inverse hyperbolic cosine (acosh(#), acosh(m))
+atanh(): inverse hyperbolic tangent (atanh(#), atanh(m))
+asech(): inverse hyperbolic secant (asech(#), asech(m))
+acsch(): inverse hyperbolic cosecant (acsch(#), acsch(m))
+acoth(): inverse hyperbolic cotangent (acoth(#), acoth(m))
+atan2(): secondary inverse tangent, computes angle given x and y coordinates (atan2(#,#))
+gd(): Gudermannian function (gd(#), gd(m))
+invGd(): Inverse Gudermannian function (invGd(#), invGd(m))
+
+Vector Functions:
+[]: Vector loading function, creates a vector whose components are the input scalars ([#*]), Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*])
+size(): the dimension of this vector (size(v))
+zero(): returns a zero vector of the provided size (zero(#)), returns a zero matrix of the provided size (zero(#,#))
+mag(): scalar magnitude (mag(v))
+magSq(), mag²(): squared scalar magnitude (magSq(v))
+unit(): unit vector, vector divided by its magnitude (unit(v))
+dot(): dot product (dot(v,v))
+perp(): perpendicular operator, rotates 2D vector 90° counterclockwise (vector must be 2D) (perp(v))
+pDot(): perpendicular dot product, equivalent to perp(a)•b or (a×b)•[0,0,1] (both vectors must be 2D) (pDot(v,v))
+cross(): cross product (both vectors must be 3D) (cross(v,v))
+abs(): Frobenius magnitude, found by taking the absolute square of each component rather than regular square (abs(v), abs(#))
+abs²(), absq(): squared Frobenius magnitude (abs²(v), abs²(#))
+norm(): Fronenius unit, divide vector by Frobenius magnitude (norm(v))
+
+
+Matrix Functions:
+[]: Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*]), vector loading function, creates a vector whose components are the input scalars ([#*])
+width(): the width of the given matrix (width(m))
+height(): the height of the given matrix (height(m))
+zero(): returns a zero matrix of the given size (zero(#,#)), returns a zero vector of the given size (zero(#))
+Identity(): returns the identity matrix of the given dimension (Identity(#))
+T(): matrix transpose (T(m))
+det(): determinant (det(m))
+tr(): trace (tr(m))
+eigenvalues(): returns a vector containing the n eigenvalues of an nxn matrix (eigenvalues(m))
+eigenvectors(): returns a matrix whose columns are the right eigenvectors of this matrix, the j-th column corresponding to the j-th eigenvalue (eigenvectors(m))
+eigenboth(): returns an array containing the eigenvalues and eigenvectors (eigenboth(m))
+√(), sqrt(): Returns one of the 2^n square roots of the inputted nxn square matrix. Boolean arguments can also be provided to specify which square root to display. The number of boolean arguments must be either 0 or n (the dimension of the matrix). (√(m), √(m,b*))
+
+Several other analytic functions of matrices have also been defined, including ln, e^x, a^x, all trig and hyperbolic functions, and the factorial.
+
+
+Array Functions:
+{}: The array loading function, creates an array whose elements are the items inputted, in order. The elements can be of any type. ({.*})
+size(): Returns the size of the array (i.e. number of elements) (size(a))
+find(): Looks for a given item in an array and returns an array listing which indices (if any) that element exists at. (find(a,.))
+contains(): Returns (as a boolean) whether or not the given element exists at least once in the given array. (contains(a,.))
+append(): takes the given array and tacks on another element. (append(a,.))
+remove(): removes the element at the given index from the given array. (remove(a,#))
+concat(): concatenates the given arrays together. (concat(a*))
+insert(): inserts the given element into the given array at the given index. (insert(a,#,.))
+sublist(): takes a sublist between the first index (inclusive) and the second index (exclusive). (sublist(a,#,#))
+removeRange(): removes the elements from the first index (inclusive) to the second index (exclusive). (removeRange(a,#,#))
+splice(): splices one array into another array, placing the first element at the given index. (splice(a,a,#))
+
+
+Date Functions:
+week(): the day of the week of the given date (week(d))
+New_Years(): New Years of that year (New_Years(#))
+Valentines(): Valentine's day of that year (Valentines(#))
+St_Patricks(): St. Patrick's day of that year (St_Patricks(#))
+Mothers_Day(): Mother's day of that year (Mothers_Day(#))
+Fathers_Day(): Father's day of that year (Fathers_Day(#))
+Halloween(): Halloween of that year (Halloween(#))
+Thanksgiving(): American Thanksgiving of that year (Thanksgiving(#))
+Christmas(): Christmas of that year (Christmas(#))
+
+
+Complex Numbers:
+Re(): returns the real (non imaginary) part (Re(#), Re(v), Re(m))
+Im(): returns the imaginary part (Im(#), Im(v), Im(m))
+conj(): Complex conjugate (conj(#), conj(v), conj(m))
+abs(): absolute value (abs(#), abs(v))
+abs²(), absq(): absolute square, square of absolute value (abs²(#), abs²(v))
+arg(): complex argument; angle measured counterclockwise from the positive real axis (arg(#))
+sgn(): signum; number divided by absolute value (sgn(#))
+csgn(): complex signum, equals 1 if real part >0 or real part=0 and imaginary part >=0, -1 otherwise. In other words, it's x/√(x²) (csgn(#))
+abs2(): secondary absolute value, equivalent to √(x²) (abs2(#))
+
+
+Rounding, Integers, and Modular Arithmetic:
+round(): rounds to the nearest integer (half-integers are rounded up) (round(#))
+floor(): rounds down (floor(#))
+ceil(): rounds up (ceil(#))
+frac(): fractional part; x-floor(x) (frac(#))
+GCF(): greatest common factor between given inputs (GCF(#*))
+LCM(): least common multiple between given inputs (LCM(#*))
+Factor(): returns the prime factorization for the given integer (Factor(#))
+modInv(): the modular inverse, the number that, when multiplied by the input mod the second input, yields 1 (modInv(#,#))
+totient(): Euler's totient function (totient(#))
+modPow(): modular exponentiation; a^b mod c (modPow(#,#,#))
+discLog(): the discrete logarithm (computed w/ the baby step giant step algorithm); discLog(a,b,c) = log_a(b) mod c (discLog(#,#,#))
+carmichael(): the carmichael totient, a reduced totient (carmichael(#))
+
+
+Piecewise:
+θ(), U(): unit step function
+rect(): rectangular function, equals 1 if |x|>1/2, 1/2 if |x|=1/2, 0 otherwise
+max(): maximum between set of numbers (max(#*))
+min(): minimum between set of numbers (min(#*))
+
+Probability:
+nPr(): permutations (nPr(#,#))
+nCr(): combinations; choose (nCr(#,#))
+rand(): random number over specific range (rand(#,#))
+randInt(): random integer over specific range (randInt(#,#))
+
+Stirling Numbers:
+stir1(): returns the Stirling number of the first kind (stir1(#,#))
+stir2(): returns the stirling number of the second kind (stir2(#,#))
+
+
+
+Gamma and Related functions:
+Γ(), Gamma(): Gamma function, equivalent to (x-1)! (Γ(#), Γ(m))
+lnΓ(), lnGamma(): Loggamma function, logarithm of gamma function (lnΓ(#), lnΓ(m))
+ψ₀(), ψ0(), digamma(): digamma function, equivalent to d/dx lnΓ(x) (ψ0(#))
+ψ(), polygamma(): polygamma function, equivalent to ψ(n,x) = d^n/dx^n ψ0(x) (ψ(#,#))
+K-Function(): K Function, equivalent to hyperfactorial x-1, 1^1*2^2*3^3*...*(x-1)^(x-1) (K-Function(#))
+Barnes-G(): Barnes G function (Barnes-G(#))
+
+Error and Related Functions:
+erf(): error function, used to find the area under the bell curve between two points (erf(#))
+erfi(): imaginary error function, erfi(x)=erf(xi)/i (erfi(#))
+erfc(): complementary error function, 1-erf(x) (erfc(#))
+erfcx(): scaled complementary error function, e^x²(1-erf(x)) (erfcx(#))
+FresnelC(): The Fresnel cosine integral ∫ cos(x²) dx (FresnelC(#))
+FresnelS(): The Fresnel sine integral ∫ sin(x²) dx (FresnelS(#))
+
+Zeta and Related Functions:
+ζ(), zeta(): The Riemann Zeta function (ζ(#))
+η(), eta(): Dirichlet Eta function (η(#))
+RS-θ(), RS-Theta(): Riemann-Siegel Theta function, the complex argument of ζ(1/2+xi) along the critical strip, plus some multiple of 2π (RS-θ(#))
+RS-Z(): Riemann-Siegel Z function, a normalized version of the zeta function evaluated on the critical strip, where each 0 corresponds to a zero on the zeta function (RS-Z(#))
+ξ(), Xi(): Riemann Xi function (ξ(#))
+
+Polylogarithms:
+Li₂(), Li2(): the dilogarithm, AKA Spence's function (Li2(#))
+Cl₂(), Cl2(): the Clausen function (Cl2(#))
+Li(): the polylogarithm, the first input must be an integer (Li(#,#))
+Cl(): the generalized Clausen function, the first input must be an integer (Cl(#,#))
+
+
+Exponential Integrals:
+Ei(): the exponential integral (Ei(#))
+E₁(), E1(): the other version of the exponential integral (E1(#))
+Ein(): the exponential integral, normalized to not be discontinuous or have a branch cut (Ein(#))
+li(): the logarithmic integral (li(#))
+Li(): the logarithmic integral, shifted so Li(2)=0 (Li(#))
+Si(): the sine integral, ∫ sin(x)/x dx (Si(#))
+Ci(): the cosine integral, ∫ cos(x)/x dx (Ci(#))
+Aux-f(): the auxiliary f function (Aux-f(#))
+Aux-g(): the auxiliary g function (Aux-g(#))
+
+Elliptic Integrals:
+EllipticK(): the complete elliptic integral of the first kind (EllipticK(#))
+EllipticF(): the complete elliptic integral of the first kind (EllipticF(#)), the incomplete elliptic integral of the first kind (EllipticF(#,#))
+EllipticE(): the complete elliptic integral of the second kind (EllipticE(#)), the incomplete elliptic integral of the second kind (EllipticE(#,#))
+EllipticΠ(), EllipticPI(): the complete elliptic integral of the third kind (EllipticΠ(#,#))
+
+Bessel Functions:
+BesselJ(): the Bessel J function, solution to x^2J"+xJ'+(x^2-a^2)J=0, parameterized as J(a,x) (BesselJ(#,#))
+BesselY(): the Bessel Y function, the other, linearly independent solution to that equation (BesselY(#,#))
+BesselJY(): the Bessel J and Y functions both computed at the same time and placed into a vector (BesselJY(#,#))
+BesselI(): the Bessel I function, a modified Bessel function for evaluating imaginary arguments; I(a,x) = i^-a*J(a,xi) (BesselI(#,#))
+BesselK(): the Bessel K function, the other modified Bessel function. K(a,x) = π/2*(I(-a,x)-I(a,x))/sin(πa) or the limit thereof (BesselK(#,#))
+BesselH1(), BesselH2(): the Hankel functions, H1 = J+Yi, H2 = J-Yi.
+
+
+Polynomials:
+PolyEval(): Using Horner's method, evaluates x=(first input) for the polynomial whose coefficients are the rest of the inputs (the last input being the constant) (PolyEval(#,#*))
+PolyRoots(): Using the eigenvalue method, returns a vector containing the roots of the polynomial whose coefficients are the inputted numbers, with the last input being the constant (PolyRoots(##*))
+
+
+Recursive Functions:
+plug(): plugs a given value for a given variable into a given equation. Variable name is input 1, variable value is input 2, equation is input 3 (plug(e,.,e))
+Σ(), Sigma(): Performs a finite summation. Variable name is input 1, starting index is input 2, ending index is input 3, equation to sum is input 4 (Σ(e,#,#,e))
+Π(), Pi(): Performs a finite product. Variable name is input 1, starting index is input 2, ending index is input 3, equation to multiply is input 4 (Π(e,#,#,e)) 
+BuildVec(): builds a vector using a set of rules, namely that it's size is the first input, the components are indexed by the second input (a variable), and each component is equal to the equation provided by the third input (BuildVec(#,e,e))
+BuildMat1(): builds a matrix of the specified size (inputs 1 & 2), whose components are indexed by the variables in inputs 3 & 4, and whose each component is found via the equation in input 5 (BuildMat1(#,#,e,e,e))
+BuildMat2(): builds a matrix of the specified size (inputs 1 & 2), whose rows are indexed by the variable in input 3, and whose each row vector is equal to the equation in input 4 (BuildMat2(#,#,e,e))
+BuildArray(): builds an array of the specified size (input 1), whose components are indexed by the variable in input 2, and whose each component is found via the equation in input 3 (BuildArray(#,e,e))
+∀(), AND(): "For All", similar to summation or product, but using logical AND on each input. Input 1 is variable name, input 2 is starting index, input 3 is ending index, input 4 is the boolean expression to AND together. Returns true if the expression evaluates to true for all indices, false otherwise (∀(e,#,#,e))
+∃(), OR(): "There exists", similar to summation or product, but using logical OR on each input. Input 1 is variable name, input 2 is starting index, input 3 is ending index, input 4 is the boolean expression to OR together. Returns true if the expression evaluates to true for at least one index, false otherwise (∃(e,#,#,e))
+d/dx(): Numerically approximates the derivative of a given function at a given point. Input 1 is the variable name, input 2 is the evaluation point, input 3 is the equation to differentiate, input 4 (optional) is the size of dx, input 5 (optional) is the degree of the polynomial used to approximate this (d/dx(e,#,e,#?,#?))
+d²/dx²(), d^2/dx^2(): Numerically approximates the second derivative of a given function at a given point. Input 1 is the variable name, input 2 is the evaluation point, input 3 is the equation to differentiate, input 4 (optional) is the size of dx, input 5 (optional) is the degree of the polynomial used to approximate this (d²/dx²(e,#,e,#?,#?))
+dⁿ/dxⁿ(), d^n/dx^n(): Numerically approximates the nth derivative of a given function at a given point. Input 1 is the n (number of times differentiated), input 2 is the variable name, input 3 is the point of evaluation, input 4 is the function itself, input 5 (optional) is the size of dx, input 6 (optional) is the degree of the polynomial used to apporoximate this (dⁿ/dxⁿ(#,e,#,e,#?,#?))
+∫(), Integral(): Numerically approximates the definite integral of a given function between two given points. Input 1 is the variable name, input 2 is the lower bound, input 3 is the upper bound, input 4 is the equation to integrate, input 5 (optional) is the number of samples to use, input 6 (optional) is the degree of the polynomial for our Newton-Cotes algorithm. (∫(e,#,#,e,#?,#?))
+limit(): Numerically approximates the two-sided limit of a function as the input approaches a point, using the surrounding points as inference. Input 1 is the variable name, input 2 is the evaluation point, input 3 is the equation to which we find the limit, input 4 (optional) is the dx to use, input 5 (optional) is the degree of the polynomial used to approximate our solution (limit(e,#,e,#?,#?))
+Secant(): Uses the secant method (superlinear convergence) to attempt to compute a nearby root for the given function. Input 1 is the input variable name, inputs 2 and 3 are our seed points for the secant method, input 4 is the equation we're trying to find the root of (Secant(e,#,#,e))
+Newton(): Uses Newton's method (quadratic convergence) to attempt to compute a nearby root for the given function. Input 1 is the input variable name, input 2 is the initial point, input 3 is the equation we want the root for, input 4 is the derivative of said equation. (Newton(e,#,e,e))
+Halley(): Uses Halley's method (cubic convergence) to attempt to compute a nearby root for the given function. Input 1 is the input variable name, input 2 is the initial point, input 3 is the equation we want the root for, input 4 is the derivative of said equation, input 5 is the second derivative of said equation. (Halley(e,#,e,e,e))
+Euler(), EulerMid(), ExpTrap(), RK4(): Uses Euler's method, the midpoint method, the explicit trapezoid rule, and the 4th order Runge Kutta method, respectively, to approximate the solution to a given first order differential equation, evaluating said approximated solution at a given point. Input 1 is the name of the function's input variable, input 2 is the name of its output variable, input 3 is the initial value of the input, input 4 is the initial value of the output, input 5 is the value of the input at the point where we wish to know the output, input 6 is the formula for the first derivative of our output (the differential equation), and input 7 (optional) is the number of samples we wish to take over this interval. (Euler(e,e,#,.,#,e,#?), EulerMid(e,e,#,.,#,e,#?), ExpTrap(e,e,#,.,#,e,#?), RK4(e,e,#,.,#,e,#?))
+
+
+
+
+Order of Operations & Parsing:
+
+The well-known grade school order of operations is PEMDAS; first evaluate what's in parentheses, then exponents, then multiplication and division (which are tied in terms of precedence), then addition and subtraction (which, again, are tied).
+
+Since this calculator has many, many more operations, however, it needs a more complicated order of operations. This is also referred to as operator precedence.
+
+First of all, anything in parentheses is evaluated. Parentheses are evaluated from innermost to outermost. This includes functions that use parentheses, such as abs(), and also includes other types of brackets, such as [] or {}.
+
+Beyond that, however, all operators will be executed based on their operator precedence, with the highest precedence operators being executed first, and the lowest precedence executed last. In the case of a tie, two operators will be executed from left to right if those operators are left-associative, or right to left if right-associative. Most operators are left associative, with the exception of the ^ operator.
+
+Operators can either be unary (one input), binary (two inputs), or ternary (three inputs). Unary inputs are either on the left or right of their input. For instance, - (negation) gets put on the left, while ! (factorial) gets put on the right. As of right now, there is only one ternary operator, and that's the ?: operator. The ? and : are treated as one operator, and the equation parser has to perform special protocol to fuse them into one operation.
+
+Precedence (highest to lowest):
+_ (indexing operator)
+^, ², ³, ! (factorial)      (^ is right associative)
+- (negation), ! (logical NOT), ~ (logical NOT)
+·, •, × (dot or cross product)
+*, /, %, //, \
++, -
+
+<, >, <=, >=
+=, ==, !=
+
+&
+|
+
+&&
+||
+
+?:
+:= (assignment operator, not yet implemented)
+
+
+
+When two items are placed side by side without any operators in between, an implicit * operator is placed between them before the equation is parsed.
