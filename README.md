@@ -43,5 +43,16 @@ To view differences between this version and the previous version, please view t
 
 To view and/or edit the code, Please check out the "Open Source Code" folder.
 
+
+
+If your application crashes on mobile, it will copy a crash report to your clipboard (this feature will also soon be added to the PC version). If your calculator crashes, please send this crash report (unedited) to chrismaguschak@gmail.com, with the subject "Maths_Machine crash report". Thank you!
+
+**Credits**
+
+Credit goes to the Processing Foundation for their free, open source graphics library and IDE, which were used to develop this application for both PC and Android.
+Processing was used for development as, since it has both a regular Java mode and an Android development mode, this allowed for both the PC and mobile application to be written with mostly the same code, allowing for cross-platform parity.
+
+This code was written by Christopher Maguschak, GitHub username "vmathmachine".
+
 Please note that this code is the intellectual property of Christopher Maguschak (vmathmachine). You are free to modify, use, and redistribute the code **for non-commercial purposes**,
 provided that you give appropriate credit to the original owner. For commercial use or any other queries, you must obtain express permission from the owner.
