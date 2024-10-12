@@ -156,6 +156,7 @@ void initializeKeypad(final Button palette, float keyButtWid, float keyButtHig, 
     openKeyboard();
   } });
   
+  keyPad.setPromoteDist(max(keyButtWid, keyButtHig));
   
   final EnumMap<GraphMode, KeyPad> primary = new EnumMap(GraphMode.class); //this right here will store all of the primary keypads, each keyed by which sets of variables we need to show
   
@@ -191,8 +192,8 @@ void initializeKeypad(final Button palette, float keyButtWid, float keyButtHig, 
   secondary_orig.keys[1][1].setOnRelease(new Action() { public void act() { if(io.typer!=null) { //TODO remove this once you actually fully implement clipboard accessibility. This will take a lot of time, so no rush...
     String text = getTextFromClipboard();     //grab the text from the clipboard
     if(text!=null) {
-      io.typer.eraseSelection(); //erase highlighted selection (if there is one)
-      io.typer.insert(text);     //insert it into the input box
+      io.typer.eraseSelection(true); //erase highlighted selection (if there is one)
+      io.typer.insert(text);         //insert it into the input box
     }
   } } });
   
@@ -232,7 +233,6 @@ void initializeKeypad(final Button palette, float keyButtWid, float keyButtHig, 
   ctrlPanel.activate();
   
   ctrlPanel.panel.setDragMode(DragMode.SWIPE,DragMode.NONE); //make the main control panel swipeable
-  ctrlPanel.panel.promoteDist = 80; //make it somewhat hard to swipe, though
 }
 
 void initializeEquationList(final Button palette, final float x, final float y, final float w, final float h, final float addButtHig, final float equationHeight, final float thick2, final float inpBuffY) {
@@ -253,9 +253,9 @@ void initializeGraphMenu(Button palette, float buttHig) {
   Button extreme = (Button)new Button(4*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Max/Min",#00FFFF);
   Button reset = (Button)new Button(5*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Reset",#00FFFF);
   
-  final Button axes = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Axes",#00FFFF).setActive(false),
-             labels = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Labels",#00FFFF).setActive(false),
-            nothing = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("None",#00FFFF).setActive(false);
+  final Button labels = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Labels",#00FFFF).setActive(false),
+                 axes = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText(  "Axes",#00FFFF).setActive(false),
+              nothing = (Button)new Button(2*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText(  "None",#00FFFF).setActive(false);
   
   final Button point = (Button)new Button(3*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Points",#00FFFF).setActive(false),
                 wire = (Button)new Button(3*buttWid,0,buttWid,buttHig).setPalette(palette).setParent(graphMenu).setText("Wireframe",#00FFFF).setActive(false),
@@ -274,9 +274,9 @@ void initializeGraphMenu(Button palette, float buttHig) {
     }
   } });
   
-  axes   .setOnRelease(new Action() { public void act() { equatList.axisMode = 1;    axes.setActive(false);  labels.setActive(true); } });
-  labels .setOnRelease(new Action() { public void act() { equatList.axisMode = 2;  labels.setActive(false); nothing.setActive(true); } });
-  nothing.setOnRelease(new Action() { public void act() { equatList.axisMode = 0; nothing.setActive(false);    axes.setActive(true); } });
+  labels .setOnRelease(new Action() { public void act() { equatList.axisMode = 1;  labels.setActive(false);    axes.setActive(true); } });
+  axes   .setOnRelease(new Action() { public void act() { equatList.axisMode = 0;    axes.setActive(false); nothing.setActive(true); } });
+  nothing.setOnRelease(new Action() { public void act() { equatList.axisMode = 2; nothing.setActive(false);  labels.setActive(true); } });
   
   point.setOnRelease(new Action() { public void act() { equatList.connect = ConnectMode.WIREFRAME; point.setActive(false);  wire.setActive(true); } });
   wire .setOnRelease(new Action() { public void act() { equatList.connect = ConnectMode.SURFACE;    wire.setActive(false);  surf.setActive(true); } });

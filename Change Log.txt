@@ -1,7 +1,11 @@
-Text selection through highlighting was added. Double tap text to highlight it (which also brings up the text selection menu), triple tap to bring up the text selection menu w/out highlighting. It is planned that, in the next update, you will also be able to highlight text by way of the press-and-hold gesture.
+The text selection mechanism was finished.
 
-A graphing bug was fixed. The bug being that certain discontinuous functions, such as y=e^(1/x), will fail to render parts of it. In the case of e^(1/x), the branch that goes to 0 will intermittently render and then not render. Now, however, it should always render.
+New matrix functions were added (such as eigenrow, eigencolumn, diag, etc).
 
-A few extra functions for arrays were also added, such as splicing, searching, etc.
+Fixed a bug whereby some button presses weren't registered (especially if pressed in rapid succession).
 
-The code has also been refactored to generate text quicker and more efficiently.
+Fixed a bug where press-and-hold functionality would get temporarily disabled for seemingly no reason.
+
+Synchronized fonts so as to allow all applicable characters to render.
+
+Added labels for 3D graphing.

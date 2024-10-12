@@ -1,10 +1,35 @@
+IMPORTANT PREAMBLE:
+
+Tapping * twice creates ^
+Tapping the bottom left button brings up the keyboard
+
+END OF PREAMBLE
+
+
+
+
+
+
 Installation/Updating:
+
+This application runs on Windows, Linux, and Android. It will hopefully be soon compatible with MacOS. Unfortunately, for several reasons, there will not be any official release for iOS.
+
+
+PC:
+
+Open the folder "Executables". Download whichever folder corresponds to your current operating system. Place the folder somewhere secure, where you won't accidentally delete it. Feel free to rename it. To open the application, please double tap "Maths_Machine" or "Maths_Machine.exe". Feel free to create a shortcut of "Maths_Machine" to open and close this whenever you'd like.
+
+To update the app, you download the new version of this application. Then, in the OLD folder that you previously downloaded, copy the "saves" folder to the NEW folder you just now downloaded. Doing this transfers all of your old data to the new, updated version. Replace your old shortcut with a shortcut for the new "Maths_Machine". When you're sure that your new version works, you may delete the old folder and its contents.
+
+
+
+Mobile:
 
 Note: The device you're using must run on Android OS (or be an emulator for Android OS). This includes Samsung phones, Google Pixels, the OnePlus, and many others.
 
-From your mobile device, open the Google Drive folder you found this in, "Calculator App (Math's Machine)", look through the folders. Each folder contains a different version of this app, and each folder is named based on when each version was submitted (Month Day Year hour:minute). Click the most recent folder (unless you want to use an older version), and then press the file (it should end in .apk). Open with PackageInstaller. It might warn you about Google not recognizing the developer. Press "more options", and then press "install anyway". The app "Maths_Machine" will now be a part of your app library.
+Open the folder "Executables", open "Android", download  "maths_machine_release.apk" to your Android device. Tap the downloaded file. Open with PackageInstaller. It might warn you about Google not recognizing the developer. Press "more options", and then press "install anyway". The app "Maths_Machine" will now be a part of your app library.
 
-To update the app, or restore it to a previous version, simply go to the folder "Calculator App (Math's Machine)", find the most recent folder (or whichever version you wanna update/restore to). Tap the apk file, open with PackageInstaller, and then when asked if you wanna update the app, select "update".
+To update the app, you download the apk for the most recent version of the app (or whichever version you'd like to update to), then open it to install it. It will ask if you'd like to update the app, you press yes, and it will update. To downgrade the app, you do the same thing, but download the apk for the earlier version you'd like to downgrade to.
 
 
 
@@ -18,7 +43,7 @@ There are 3 tabs at the top: Calculator, Equations, and Graph. The Calculator ta
 
 Calculator:
 
-The set up is simple. You type in a question, you press the enter key (bottom right), you get an answer. If there were any syntax errors, or if your request was invalid (e.g. cos(true), ln(yesterday)), you'll receive an error message instead of an answer.
+The setup is simple. You type in a question, you press the enter key (bottom right), you get an answer. If there were any syntax errors, or if your request was invalid (e.g. cos(true), ln(yesterday)), you'll receive an error message instead of an answer.
 
 Above the query box is your history panel, this is where the past 128 questions and their 128 respective answers are displayed, with the most recent at the bottom, and the oldest at the top. If you'd like to change the number of results displayed, use the function SetHistoryDepth() in the query box (more info in the table of functions). Tapping a previous question puts the contents of said question into the query box, right in front of your cursor. Tapping a previous answer does the same thing, but also wraps the answer in parentheses (in case you tap something like "1+2i").
 
@@ -43,7 +68,7 @@ There are buttons at the bottom. Most of them don't work yet. The "2D" button sw
 
 In 3D mode, you swipe your finger around to rotate the graph around. To zoom in or out, use a two-fingered pinching motion, moving your fingers closer together to zoom out, farther apart to zoom in. The ability to move the graph's position hasn't been implemented yet.
 
-In 3D mode, there are also buttons at the bottom. The "3D" button swaps to 2D mode. The "Reset" button resets position, rotation, and scale. The "Axes"/"Labels"/"None" buttons toggle the display of your 3D axes. "Axes" enables the axes, "Labels" enables the tickmarks (which, because I'm stupid, aren't yet labeled), and "None" disables both. Also, because I'm stupid, you can't yet do this in 2D mode. The "Points"/"Wireframe"/"Surface" buttons change how graphs are shown. "Points" means that all graphs are just shown as a bunch of dots. "Wireframe" means the dots are connected by lines. "Surface" means the dots and lines are connected by triangles. Because the renderer is stupid, Surface mode will often display farther away things in front of closer things. I don't get why. "Trace" and "Max/Min" don't do anything yet.
+In 3D mode, there are also buttons at the bottom. The "3D" button swaps to 2D mode. The "Reset" button resets position, rotation, and scale. The "Axes"/"Labels"/"None" buttons toggle the display of your 3D axes. "Labels" turns off the labels, "Axes" turns off the axes, then "None" turns them both back on. Also, because I'm stupid, you can't yet do this in 2D mode. The "Points"/"Wireframe"/"Surface" buttons change how graphs are shown. "Points" means that all graphs are just shown as a bunch of dots. "Wireframe" means the dots are connected by lines. "Surface" means the dots and lines are connected by triangles. Because the renderer is stupid, if you're on mobile, Surface mode will often display farther away things in front of closer things. I don't get why. "Trace" and "Max/Min" don't do anything yet.
 
 
 
@@ -75,7 +100,7 @@ brown=128,64,0
 peach=255,192,160
 plum=128,0,128
 
-At some point I'll also implement compatibility with hex codes.
+You can also input hex codes (e.g. the hex code for red is #ff0000). Upon pressing enter, they'll be reparsed into RGB mode. Hex codes are quick, efficient ways to copy-paste colors on computers. The hash # symbol must be included or it won't be parsed as a hex code.
 
 
 
@@ -83,7 +108,7 @@ At some point I'll also implement compatibility with hex codes.
 
 Advanced Keypad:
 
-The keypad is set up similarly to the standard numpad on many keyboards. More precisely, it's set up like the number pad that accountants use, which is exactly like the traditional numpad, but with a backspace key added at the top right. It should be noted that the - key is used as both minus and the negative sign.
+The keypad is set up similarly to the standard numpad on many keyboards. More precisely, it's set up like the number pad that accountants use, which is exactly like the traditional numpad, but with a backspace key added at the top right, and the big + key squashed into a + and - key. It should be noted that the - key is used as both minus and the negative sign.
 
 To make the best use of space, many buttons are given special "double tap" functionality. Tapping the period key twice types i (i.e. √(-1)), tapping the * symbol twice types the ^ symbol (for exponents). Additionally, tapping the "e E" key once types e (i.e. 2.7182818...), but tapping it twice types E (used for exponential notation, like in 6.02E23).
 
@@ -96,7 +121,7 @@ The left arrow and right arrow move your cursor left or right. Unlike most keys,
 
 If you lose track of how many parentheses you've typed, look at the left parenthesis symbol. It always displays a number showing how many unclosed left parentheses you have. If it's positive, you have too many left parentheses. If it's negative, you have too many right parentheses. Note that even if it's 0, that doesn't necessarily guarantee that all your parentheses are properly closed. For instance, the expression "())(" has just as many left parentheses as right, but since not every right parenthesis comes after its corresponding left parenthesis, it's not valid.
 
-When you press the 2nd key, it changes some of the keys displayed. π and e E become Ans and comma (Ans being the most recent answer). √ and ln become sin and cos. / becomes %. And ( and ) become CTRL+V and CTRL+A+C. It should be noted that text selection is not currently supported because Android SDK can't make anything easy for anyone. So, instead, I manually added a button that lets you paste the contents of the clipboard (CTRL+V) and a button that lets you copy the contents of the entire textbox TO your clipboard (CTRL+A+C). It should also be noted that the % sign does NOT refer to actual percentages, and instead represents the modulo operator. I've been thinking of removing this shortcut.
+When you press the 2nd key, it changes some of the keys displayed. π and e E become Ans and comma (Ans being the most recent answer). √ and ln become sin and cos. / becomes %. And ( and ) become Copy and Paste. These were originally added before the text highlighting functionality was implemented (and hence there was no other way to use the clipboard). After said functionality has been rigorously tested, those keys will most likely be replaced with [ and ]. It should be noted that Copy does not copy what is currently highlighted, but instead copies the entire selected textbox. It should also be noted that the % sign does NOT refer to actual percentages, and instead represents the modulo operator.
 
 In the Equations tab, things are a little different. The π key is reutilized to type out the input variable. So, in rectangular, it types x, in polar, it types θ, and in parametric, it types t. If you still wanna type π, just double tap the key. The Ans button has also been replaced with the n key. What does n do? Nothing at the moment, but it'll be very helpful for graphing at a later date.
 
@@ -120,12 +145,14 @@ If you wanna use what's known as "complex parametric", where instead of plotting
 
 v=Re(f(t)[1,-i])
 
+Explanation: This creates a vector whose x component is f(t), and whose y component is f(t)/i. If you strip this vector of its imaginary components, you now have a vector whose x component is the real part of f(t), and whose y component is the real part of f(t)/i, which is the same as the imaginary part of f(t).
+
 
 
 
 Vectors, Matrices, and other datatypes:
 
-This calculator doesn't just work with numbers. On top of supporting complex numbers, it also supports booleans, vectors, matrices, and dates (e.g. January 26, 2003). The vectors and matrices are have complex components, no errors will arise from using complex number operations on them.
+This calculator doesn't just work with numbers. On top of supporting complex numbers, it also supports booleans, vectors, matrices, arrays, and dates (e.g. January 26, 2003). The vectors and matrices are allowed to have complex components, no errors will arise from using complex number operations on them.
 
 To create a boolean, simply type "true" or "false". You can also generate one using equivalent expressions, such as 3<4 (true) or 5<5 (false). A full list of boolean functions is provided in the table later.
 
@@ -138,9 +165,9 @@ Simply type [[1,3,7],[2,1,-5]].
 
 To invert a matrix, simply use ^-1. To transpose it, use the function T(. You can multiply matrices by vectors. Matrix*vector will treat the vector as a column matrix, vector*matrix will treat the vector as a row matrix. The full list of vector and matrix functions is provided in the later table.
 
-To create a date, simply type it in the format Month day, year. So, January 7, 2009. Alternatively, the calculator also accepts the shortened 3 letter variants, such as Jan 7, 2009. It also accepts the 4 letter variant of September, Sept. These are case sensitive, though. So, the month must be capitalized, there must be a space between month and day, there must be a comma after day, and there must be a space between the comma and year. You can also omit the comma, space, and year, and it'll assume the year is this year. The constant "today" stores today's date, I'm sure you can guess what "tomorrow" and "yesterday" will return. To find the number of days between two dates, simply subtract them. So, for instance, Jan 7-Jan 3 will return 4. Likewise, you can also add or subtract numbers to or from dates. Jan 7+4 returns January 11, Jan 7-4 returns January 3. The "week(" function returns what day of the week a particular date falls on. Typing a day of the week (capitalized) will return the next time that day of the week happens (unless that day is today, then it returns today). To find when a particular holiday occurs during a particular year, simply enter Holiday_name(year). Not all holidays work. Easter does not currently work since that depends on the phases of the moon, which is difficult to calculate. A full list of date functions is provided in the table of functions, which will be seen later.
+To create a date, simply type it in the format Month day, year. So, January 7, 2009. Alternatively, the calculator also accepts the shortened 3 letter variants, such as Jan 7, 2009. It also accepts the 4 letter variant of September, Sept. These are case sensitive, though. So, the month must be capitalized, there must be a space between month and day, there must be a comma after day, and there must be a space between the comma and year. You can also omit the comma, space, and year, and it'll assume the year is this year. The constant "today" stores today's date, I'm sure you can guess what "tomorrow" and "yesterday" will return. To find the number of days between two dates, simply subtract them. So, for instance, Jan 7-Jan 3 will return 4. Likewise, you can also add or subtract numbers to or from dates. Jan 29+4 returns February 2, February 2-4 returns January 29. The "week(" function returns what day of the week a particular date falls on. Typing a day of the week (capitalized) will return the next time that day of the week happens (unless that day is today, then it returns today). To find when a particular holiday occurs during a particular year, simply enter Holiday_name(year). Not all holidays work. Easter does not currently work since that depends on the phases of the moon, which is difficult to calculate. A full list of date functions is provided in the table of functions, which will be seen later.
 
-Arrays are an important list-like data structure that allows you to store multiple components, regardless of their data type, in one location. They're created using the curly brackets {}. Unlike vectors and matrices, where the first index is index 1, for arrays, the first index is index 0. They're also a fundamental component for programming languages and Turing machine systems (a system capable of executing any algorithm). While this calculator is not yet Turing complete, it will be at a later point, and the addition of arrays is an important componet for this transition.
+Arrays are an important list-like data structure that allows you to store multiple components, regardless of their data type, in one location. They're created using the curly brackets {}. Unlike vectors and matrices, where the first index is index 1, for arrays, the first index is index 0. They're also a fundamental component for programming languages and Turing complete systems (a system capable of executing any algorithm). While this calculator is not yet Turing complete, it will be at a later point, and the addition of arrays is an important componet for this transition.
 
 
 
@@ -185,7 +212,7 @@ Arithmetic:
 //: truncated division, division without remainder, a//b = floor(a/b) (#//#)
 %: modulo, remainder of division, a%b = a-b*(a//b) (#%#)
 **: exponential operator (#**#, m**#, #**m)
-^: exponential operator (#^#, m^#, #^m), logical XOR (b^b)
+^: exponential operator (#^#, m^#, #^m)
 ²: square (#², m²)
 ³: cube (#³, m³)
 
@@ -199,23 +226,23 @@ Inequalities:
 >=: greater than or equal to (#>=#, d>=d)
 
 Boolean:
-!: NOT; logical negation (!b), factorial (#!, m!)
+!: NOT; logical negation (!b)
 ~: NOT; logical negation (~b)
 &: AND; logical disjunction (b&b)
 &&: AND with short circuit evaluation (b&&b)
 |: OR; logical conjunction (b|b)
 ||: OR with short circuit evaluation (b||b)
-^: XOR; logical inequality (b^b), exponential operator (#^#, m^#, #^m)
+^: XOR; logical inequality (b^b)
 ?: : ternary operator; piecewise operator (b?.:.), evaluates the boolean expression to the left of the ?. If true, it returns the thing between the ? and :, otherwise, it returns the thing to the right of the :
 
 Vector/Matrix:
-_: Array access operator. It returns the nth element of a vector (as a scalar), the nth row of a matrix (as a vector), or the nth element of an array. Vectors and matrices have their first element be element 1, while arrays have it as element 0. (v_#, m_#, m_#_#)
+_: Array access operator. It returns the nth element of a vector (as a scalar), the nth row of a matrix (as a vector), or the nth element of an array. Vectors and matrices have their first element be element 1, while arrays have it as element 0. (v_#, m_#, m_#_#, a_#)
 •, ●: dot product (v•v)
 ×: cross product (v×v)
 
 Other:
 
-!: factorial (#!, m!), NOT; logical negation (!b)
+!: factorial (#!, m!)
 
 
 
@@ -228,13 +255,14 @@ SetHistoryDepth(): Sets how many of the most recent questions are displayed in t
 
 GetHistoryDepth(): returns the current history depth (GetHistoryDepth())
 
-ulp(): Unit in the last place, the smallest amount a number can be off by in a finite precision environment (i.e. with floating points or with numbers expressed in scientific notation). For example, ulp(2.352*10^15) = 0.001*10^15, or 1.000*10^12. The ulp of a negative number will be positive. The ulp of 0 will be the smallest positive floating point. The ulp of a complex number will either be the ulp of the real or imaginary part, whichever is bigger. ( ulp(#) )
+ulp(): Unit in the last place, the smallest amount a number can be off by in a finite precision environment (i.e. with floating points or with numbers expressed in scientific notation). For example, if you use scientific notation with 4 sig figs, ulp(2.352*10^15) = 0.001*10^15, or 1.000*10^12. This calculator uses double precision floating points, and thus stores 53 binary digits, so ulp(x) is usually roughly 2^-52*x. The ulp of a negative number will be positive. The ulp of 0 will be the smallest positive floating point. The ulp of a complex number will either be the ulp of the real or imaginary part, whichever is bigger. ( ulp(#) )
 
 Elementary (non-trig):
 (): identity function ( (.) )
-√(): square root (√(#), √(m), √(m,b*))
-ln(): natural logarithm (ln(#), ln(m), ln(m,#*))
-log(): common logarithm (log(#), log(m))
+√(): square root (√(#))
+∛(), cbrt(): cube root (∛(#))
+ln(): natural logarithm (ln(#))
+log(): common logarithm (log(#))
 
 Trigonometry:
 sin(): sine (sin(#), sin(m))
@@ -266,7 +294,7 @@ gd(): Gudermannian function (gd(#), gd(m))
 invGd(): Inverse Gudermannian function (invGd(#), invGd(m))
 
 Vector Functions:
-[]: Vector loading function, creates a vector whose components are the input scalars ([#*]), Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*])
+[]: Vector loading function, creates a vector whose components are the input scalars ([#*])
 size(): the dimension of this vector (size(v))
 zero(): returns a zero vector of the provided size (zero(#)), returns a zero matrix of the provided size (zero(#,#))
 mag(): scalar magnitude (mag(v))
@@ -282,7 +310,7 @@ norm(): Fronenius unit, divide vector by Frobenius magnitude (norm(v))
 
 
 Matrix Functions:
-[]: Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*]), vector loading function, creates a vector whose components are the input scalars ([#*])
+[]: Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*])
 width(): the width of the given matrix (width(m))
 height(): the height of the given matrix (height(m))
 zero(): returns a zero matrix of the given size (zero(#,#)), returns a zero vector of the given size (zero(#))
@@ -290,9 +318,15 @@ Identity(): returns the identity matrix of the given dimension (Identity(#))
 T(): matrix transpose (T(m))
 det(): determinant (det(m))
 tr(): trace (tr(m))
-eigenvalues(): returns a vector containing the n eigenvalues of an nxn matrix (eigenvalues(m))
-eigenvectors(): returns a matrix whose columns are the right eigenvectors of this matrix, the j-th column corresponding to the j-th eigenvalue (eigenvectors(m))
+eigenvalues(): returns an array containing the n eigenvalues of an nxn matrix (eigenvalues(m))
+eigenvectors(): returns an array containing the right eigenvectors of this matrix (eigenvectors(m))
+leigenvectors(): returns an array containing the left eigenvectors of this matrix (leigenvectors(m))
 eigenboth(): returns an array containing the eigenvalues and eigenvectors (eigenboth(m))
+eigencolumns(): returns a matrix whose columns are the right eigenvectors of this matrix (eigencolumns(m))
+eigenrows(): returns a matrix whose rows are the left eigenvectors of this matrix (eigenrows(m))
+eigenvalDiag(): returns a square diagonal matrix whose diagonal entries are the eigenvalues (eigenvalDiag(m))
+column(): converts a vector into a column matrix (column(v))
+row(): converts a vector into a row matrix, equivalent to just using [] (row(v))
 √(), sqrt(): Returns one of the 2^n square roots of the inputted nxn square matrix. Boolean arguments can also be provided to specify which square root to display. The number of boolean arguments must be either 0 or n (the dimension of the matrix). (√(m), √(m,b*))
 
 Several other analytic functions of matrices have also been defined, including ln, e^x, a^x, all trig and hyperbolic functions, and the factorial.
@@ -344,7 +378,7 @@ frac(): fractional part; x-floor(x) (frac(#))
 GCF(): greatest common factor between given inputs (GCF(#*))
 LCM(): least common multiple between given inputs (LCM(#*))
 Factor(): returns the prime factorization for the given integer (Factor(#))
-modInv(): the modular inverse, the number that, when multiplied by the input mod the second input, yields 1 (modInv(#,#))
+modInv(): the modular inverse; the number that, when multiplied by the input (mod the second input), yields 1 (modInv(#,#))
 totient(): Euler's totient function (totient(#))
 modPow(): modular exponentiation; a^b mod c (modPow(#,#,#))
 discLog(): the discrete logarithm (computed w/ the baby step giant step algorithm); discLog(a,b,c) = log_a(b) mod c (discLog(#,#,#))
@@ -455,7 +489,7 @@ Euler(), EulerMid(), ExpTrap(), RK4(): Uses Euler's method, the midpoint method,
 
 Order of Operations & Parsing:
 
-The well-known grade school order of operations is PEMDAS; first evaluate what's in parentheses, then exponents, then multiplication and division (which are tied in terms of precedence), then addition and subtraction (which, again, are tied).
+The well-known grade school order of operations is PEMDAS; first evaluate what's in parentheses, then exponents, then multiplication and division (which are tied in terms of precedence), then addition and subtraction (which are also tied).
 
 Since this calculator has many, many more operations, however, it needs a more complicated order of operations. This is also referred to as operator precedence.
 
@@ -467,11 +501,11 @@ Operators can either be unary (one input), binary (two inputs), or ternary (thre
 
 Precedence (highest to lowest):
 _ (indexing operator)
-^, ², ³, ! (factorial)      (^ is right associative)
+^, **, ², ³, ! (factorial)      (^ is right associative)
 - (negation), ! (logical NOT), ~ (logical NOT)
 ·, •, × (dot or cross product)
 *, /, %, //, \
-+, -
++, - (subtraction)
 
 <, >, <=, >=
 =, ==, !=
@@ -487,4 +521,10 @@ _ (indexing operator)
 
 
 
+Most of this was borrowed from the operator precedence for C-like programming languages (this includes C++ and Java). A notable exception is the ^ taking higher precedence than most other operators.
+
+
 When two items are placed side by side without any operators in between, an implicit * operator is placed between them before the equation is parsed.
+
+
+It should be noted that \ (the left division operator) is left-associative, and is of equal precedence with * and /. Caution should be taken with this, as it means that 2*3\4 = 6\4 = 2/3. The multiplication in the denominator was executed before the division, despite not being wrapped in parentheses. Those with a deep intuition for the standard right division / operator might need some getting used to, if they plan on using the \ operator. The main use for said operator is in matrix operations, whereby A\B is faster than A^-1*B, as the inversion and multiplication can be performed all in one step.

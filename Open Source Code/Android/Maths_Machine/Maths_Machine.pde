@@ -2,7 +2,11 @@ import vsync.*;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.EnumMap;
+import java.util.concurrent.Semaphore;
 //import processing.sound.*;
 import complexnumbers.*;
 
@@ -114,7 +118,7 @@ void setup() {
   Textbox.defaultHandleRadius = 0.023*width;
   
   io = new Mmio(this);
-  //io.cursors.add(new Cursor(mouseX,mouseY)); //PC only
+  //io.cursors.add(new UICursor(mouseX,mouseY)); //PC only
   androidInitClipboard(this);     //Android only
   androidInitSharedPreferences(); //Android only
   interfaceInit(io);
@@ -168,22 +172,27 @@ void draw() {
 void draw2(final PGraphics pg) {
   try {
     time = System.currentTimeMillis(); //record current time
-      
+    
+    io.performPendingPreOperations(); //perform all pending pre-operations that need to be executed before the rest
+    
     io.targetAllChildren(); //perform the targeting algorithm on all boxes
-    io.updateCursorsAndroid(touches); //Android only, records all changes in the touches[] array and updates accordingly
+    
+    //io.updateCursorsAndroid(touches); //Android only, records all changes in the touches[] array and updates accordingly
+    io.cursorActions.acquire();
+    TouchEvent.Pointer[] currTouches = touches;
+    io.cursorActions.addUpdates(currTouches);
+    io.cursorActions.performUpdates(currTouches);
+    io.cursorActions.release();
+    
     io.updateButtonHold(time, timePrev); //update the buttons that are being held down
     //io.updatePanelScroll(io.cursors.get(0)); //PC only, records all updates in the mouseWheel and updates accordingly
     io.updatePanelDrag();       //update the act of cursor(s) dragging panel(s)
     io.updateCaretsRecursive(); //update the caret positions (if we're dragging them)
     io.updatePhysicsRecursive(0.001*(time - timePrev));
     
-    if(io.typer!=null && io.typer.correctHandlesLater) { //shhhhh, I'll put this somewhere better, later
-      io.typer.buddy.correctHandles();
-      //here's where we'd have to say to remove handles IF the handles should be removed
-      io.typer.correctHandlesLater = false;
-    }
+    io.performPendingPostOperations(); //perform all pending post-operations that could not be executed before
     
-    io.removeHandles(); //remove all handles scheduled to be removed
+    
     
     grapher2D.updateFromTouches(io,0,0.055555556*height); //update both graphs based on our interactions with the screen
     grapher3D.updateFromTouches(io,0,0.055555556*height);
@@ -265,51 +274,48 @@ static String getUsefulInfo(Exception ex) { //obtain useful information about an
 }
 
 void mousePressed() {
-  Cursor curs = io.cursors.get(0); //PC: there's only one cursor
-  
-  if(curs.press==0) { //if the cursor was previously not pressed
-    io.setCursorSelect(curs); //set the cursor select to whatever it's selecting
-  }
+  UICursor curs = io.cursors.get(0); //PC: there's only one cursor
   
   curs.press(mouseButton); //press the correct button
-  
-  io.updateButtons(curs, (byte)1, false); //update the buttons, with code 1 for pressing
-  
-  if(io.typer!=null && io.typer.selectMenu!=null && curs.select!=io.typer.selectMenu && (curs.select==null || curs.select.parent!=io.typer.selectMenu)) {
-    io.typer.removeSelectMenu();
-  }
 }
 
 void mouseReleased() {
-  Cursor curs = io.cursors.get(0); //PC: there's only one cursor
+  UICursor curs = io.cursors.get(0); //PC: there's only one cursor
+  
   curs.release(mouseButton); //release the correct button
-  
-  io.updateButtons(curs, (byte)0, false); //update the buttons, with code 0 for releasing
-  //TODO make this compatible with multiple mouse buttons being pressed & released
-  
-  if(curs.press==0) {     //if cursor isn't pressing anymore
-    curs.setSelect(null); //set select for the just-released cursor to null
-  }
-  
-  if(io.typer!=null && io.typer.hMode==Textbox.HighlightMode.MOBILE && io.typer.selectMenu==null && io.typer.highlighting) {
-    io.typer.addSelectMenu();
-  }
 }
 
 void mouseMoved() {
-  Cursor curs = io.cursors.get(0); //PC: there's only one cursor
+  UICursor curs = io.cursors.get(0); //PC: there's only one cursor
   curs.updatePos(mouseX,mouseY);   //change the cursor position
   
-  io.updateButtons(curs, (byte)2, false); //update the buttons, with code 2 for moving
+  curs.move();
 }
 
 void mouseDragged() {
-  Cursor curs = io.cursors.get(0); //PC: there's only one cursor
+  UICursor curs = io.cursors.get(0); //PC: there's only one cursor
   curs.updatePos(mouseX,mouseY);   //change the cursor position
   
-  Mmio.attemptSelectPromotion(curs); //attempt select promotion
-  io.updateButtons(curs, (byte)3, false); //update the buttons, with code 3 for dragging
+  curs.drag(); //perform dragging functionality
 }*/
+
+void touchStarted() {
+  io.cursorActions.acquire();
+  io.cursorActions.addUpdates(touches);
+  io.cursorActions.release();
+}
+
+void touchEnded() {
+  io.cursorActions.acquire();
+  io.cursorActions.addUpdates(touches);
+  io.cursorActions.release();
+}
+
+void touchMoved() {
+  io.cursorActions.acquire();
+  io.cursorActions.addUpdates(touches);
+  io.cursorActions.release();
+}
 
 void keyPressed() {
   while(draw2Active) { delay(1); } //wait until draw2 isn't active

@@ -191,6 +191,8 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("fp(",".",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { inp[0].fp=true; return inp[0]; } }), //the full precision function
   
   new MathFunc("ulp(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.ulpMax()); } }), //ulp (unit in last place)
+  new MathFunc("ulp(","v",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].vector.ulpMax()); } }),
+  new MathFunc("ulp(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.ulpMax()); } }),
   
   new MathFunc("sin(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.sin()); } }), //trig functions
   new MathFunc("cos(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].number.cos()); } }),
@@ -228,9 +230,11 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("gd(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
     return new MathObj(Cpx.gd(inp[0].number));
   } }),
-  new MathFunc("invGd(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+  new MathFunc("invGd(","c",tempFunc=new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
     return new MathObj(Cpx.invGd(inp[0].number));
   } }),
+  new MathFunc("gd⁻¹(","c",tempFunc),
+  
   
   new MathFunc("~","b",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(!inp[0].bool); } }), //boolean operators
   new MathFunc("&","bb",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].bool & inp[1].bool); } }),
@@ -327,13 +331,69 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("T(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.transpose()); } }),
   new MathFunc("tr(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.trace()); } }),
   new MathFunc("det(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.determinant()); } }),
-  new MathFunc("eigenvalues(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(new CVector(inp[0].matrix.eigenvalues())); } }),
-  new MathFunc("eigenvectors(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(new CMatrix(inp[0].matrix.eigenvectors())); } }),
+  new MathFunc("eigenvalues(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    Complex[] eigenvalues = inp[0].matrix.eigenvalues(); //get the eigenvalues
+    MathObj[] arr = new MathObj[eigenvalues.length];
+    for(int n=0;n<eigenvalues.length;n++) { arr[n] = new MathObj(eigenvalues[n]); }
+    return new MathObj(arr);
+  } }),
+  new MathFunc("eigenvectors(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CVector[] eigenvectors = inp[0].matrix.eigenvectors();
+    MathObj[] arr = new MathObj[eigenvectors.length];
+    for(int n=0;n<eigenvectors.length;n++) { arr[n] = new MathObj(eigenvectors[n]); }
+    return new MathObj(arr);
+  } }),
+  new MathFunc("leigenvectors(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CVector[] eigenvectors = inp[0].matrix.transpose().eigenvectors();
+    MathObj[] arr = new MathObj[eigenvectors.length];
+    for(int n=0;n<eigenvectors.length;n++) { arr[n] = new MathObj(eigenvectors[n]); }
+    return new MathObj(arr);
+  } }),
   new MathFunc("eigenboth(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
     Object[] both = inp[0].matrix.eigenvalues_and_vectors();
-    CVector vals = new CVector((Complex[])both[0]);
-    CMatrix vecs = new CMatrix((CVector[])both[1]);
+    MathObj[] vals = new MathObj[((Complex[])both[0]).length];
+    MathObj[] vecs = new MathObj[((CVector[])both[1]).length];
+    for(int n=0;n<vals.length;n++) {
+      vals[n] = new MathObj(((Complex[])both[0])[n]);
+      vecs[n] = new MathObj(((CVector[])both[1])[n]);
+    }
     return new MathObj(new MathObj(vals), new MathObj(vecs));
+  } }),
+  new MathFunc("eigencolumns(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CVector[] eigenvectors = inp[0].matrix.eigenvectors();
+    if(eigenvectors.length==0) { return new MathObj(new CMatrix(0,0)); }
+    return new MathObj(new CMatrix(eigenvectors).transpose());
+  } }),
+  new MathFunc("eigenrows(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CVector[] eigenvectors = inp[0].matrix.transpose().eigenvectors();
+    if(eigenvectors.length==0) { return new MathObj(new CMatrix(0,0)); }
+    return new MathObj(new CMatrix(eigenvectors));
+  } }),
+  new MathFunc("eigenvalDiag(","m",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    Complex[] eigenvalues = inp[0].matrix.eigenvalues();
+    CMatrix matrix = CMatrix.zero(inp[0].matrix.h,inp[0].matrix.w);
+    for(int n=0;n<eigenvalues.length;n++) {
+      matrix.set(n+1,n+1,eigenvalues[n]);
+    }
+    return new MathObj(matrix);
+  } }),
+  
+  new MathFunc("column(","v",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CMatrix matrix = CMatrix.zero(inp[0].vector.size(),1);
+    for(int n=0;n<inp[0].vector.size();n++) { matrix.set(n+1,1,inp[0].vector.get(n+1).copy()); }
+    return new MathObj(matrix);
+  } }),
+  new MathFunc("row(","v",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CMatrix matrix = CMatrix.zero(1,inp[0].vector.size());
+    for(int n=0;n<inp[0].vector.size();n++) { matrix.set(1,n+1,inp[0].vector.get(n+1).copy()); }
+    return new MathObj(matrix);
+  } }),
+  new MathFunc("diag(","v",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    CMatrix matrix = CMatrix.zero(inp[0].vector.size(),inp[0].vector.size());
+    for(int n=0;n<inp[0].vector.size();n++) {
+      matrix.set(n+1,n+1,inp[0].vector.get(n+1).copy());
+    }
+    return new MathObj(matrix);
   } }),
   
   new MathFunc("√(","m",tempFunc = new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(inp[0].matrix.sqrt()); } }),
@@ -681,6 +741,10 @@ public static FuncList functionDictionary = new FuncList( //this is a list of al
   new MathFunc("Li(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
     if(!inp[0].number.isInt()) { return new MathObj("Cannot take polylogarithm with non-integer modulus :("); }
     return new MathObj(Cpx3.polylog((int)inp[0].number.re,inp[1].number));
+  } }),
+  new MathFunc("Cl(","cc",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) {
+    if(!inp[0].number.isInt()) { return new MathObj("Cannot take Clausen function with non-integer modulus :("); }
+    return new MathObj(Cpx3.Cl((int)inp[0].number.re,inp[1].number));
   } }),
   
   new MathFunc("Ein(","c",new Functional() { public MathObj func(HashMap<String, MathObj> map, MathObj... inp) { return new MathObj(Cpx3.ein(inp[0].number)); } }), //TODO this is not correct, actually

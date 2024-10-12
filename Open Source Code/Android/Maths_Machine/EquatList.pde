@@ -27,7 +27,7 @@ public static class EquatList { //a class for holding the list of equations to b
   Graph   grapher2D; //the grapher used to graph in 2D
   Graph3D grapher3D; //the grapher used to graph in 3D
   
-  byte axisMode = 0; //0=nothing, 1=axes, 2=axes+labels
+  byte axisMode = 2; //0=nothing, 1=axes, 2=axes+labels
   ConnectMode connect = ConnectMode.POINT; //how 3D graphs connect their points
   boolean graphDim = false; //graph dimensions (false=2d, true=3d)
   
@@ -404,7 +404,7 @@ public static class EquatList { //a class for holding the list of equations to b
       grapher3D.setVisible( graphDim); //make this active IFF in 3D mode
     }
     
-    String axisButton = axisMode==0 ? "Axes" : axisMode==1 ? "Labels" : "None";
+    String axisButton = axisMode==0 ? "None" : axisMode==1 ? "Axes" : "Labels";
     String connectButton = connect==ConnectMode.POINT ? "Points" : connect==ConnectMode.WIREFRAME ? "Wireframe" : "Surface";
     for(Box b : graphMenu) {
       if(b.text[0].getText().equals("Roots")) { ((Button)b).setActive(!graphDim); }

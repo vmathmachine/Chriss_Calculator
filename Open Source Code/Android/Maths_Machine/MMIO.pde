@@ -11,7 +11,10 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   int buffWid=0, buffHig=0;                   //the width & height of the 2 dimensional array (yes, it must be a rectangular array, not a jagged array)
   long buffTime = System.currentTimeMillis(); //stores the time of the last attempt at buffer garbage collection
   
-  ArrayList<Cursor> cursors = new ArrayList<Cursor>(); //all the cursors/touches/mice/pointers on screen
+  //ArrayList<UICursor> cursors = new ArrayList<UICursor>(); //all the cursors/touches/mice/pointers on screen
+  CursorList<UICursor> cursors = new CursorList<UICursor>(); //all the cursors/touches/mice/pointers on screen
+  
+  CursorActionQueue cursorActions = new CursorActionQueue(cursors, this); //list of all the pending cursor updates
   
   //// specific options and key parameters
   
@@ -27,8 +30,8 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   static float xBuff=10, yBuff=5; //the expected buffer thickness between the walls and the text inside a textbox
   
   
-  
-  ArrayList<Textbox> handleRemovalCache = new ArrayList<Textbox>(); //a cache of textboxes whose handles need to be removed
+  Queue<Runnable> pendingPreOperationsCache = new LinkedList<Runnable>(); //a cache of pending operations to perform before all the other UI stuff has taken place
+  Queue<Runnable> pendingPostOperationsCache = new LinkedList<Runnable>(); //a cache of pending operations which need to happen after all the other UI stuff has taken place (but before the frame is over)
   
   /////////////////////////// CONSTRUCTORS ///////////////////////////////
   
@@ -43,24 +46,24 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   
   ///////////////////////// GETTERS/SETTERS //////////////////////////////
   
-  void setCursorSelect(Cursor curs) { //sets what the cursor is selecting, ASSUMING the cursor was JUST pressed down
+  void setCursorSelect(UICursor curs) { //sets what the cursor is selecting, ASSUMING the cursor was JUST pressed down
     Box box =  this.getCursorSelect(curs); //get the box this cursor is selecting, if any
     curs.setSelect(box);                   //set select to whatever we're pressing
   }
   
-  static void setDefaultButtonTimings(final float a, final float b, final float c) {
+  static void setDefaultButtonTimings(final float a, final float b, final float c) { //sets the default timings for each stage of their color changing animation
     timing1=a; timing2=b; timing3=c;
   }
   
-  static void setDefaultButtonTimings(final float t) { timing1=timing2=timing3 = t; }
+  static void setDefaultButtonTimings(final float t) { timing1=timing2=timing3 = t; } //sets the default timings all to the same amount of time
   
-  void setTyper(Textbox t) { //sets typer
-    if(typer!=null && typer!=t) {
-      typer.anchorCaret = typer.caret; typer.highlighting = false;
-      typer.buddy.clearHandles();
-      typer.removeSelectMenu();
+  void setTyper(Textbox t) {      //sets the typer we're typing into
+    if(typer!=null && typer!=t) { //if there's already a typer (other than this):
+      typer.equalizeCarets(); typer.highlighting = false; //equalize the carets, disable highlighting
+      typer.buddy.clearHandles(); //clear ts handles
+      typer.removeSelectMenu();   //remove select menu
     }
-    typer = t;
+    typer = t; //set typer
   }
   
   
@@ -94,7 +97,7 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   //"promoted" to the parent panel. If that panel can't be dragged, you go to that panel's parent. So on and so forth until you reach one that drags or you
   //surpass the mmio and reach null.
   
-  static boolean attemptSelectPromotion(Cursor curs) { //looks at a cursor and goes through the process of seeing if it can select promote, and then potentially does it, returning true if it did
+  static boolean attemptSelectPromotion(UICursor curs) { //looks at a cursor and goes through the process of seeing if it can select promote, and then potentially does it, returning true if it did
     Box select = curs.getSelect(); //get this box's select
     
     if(select==null || curs.seLocked) { return false; } //if null, or locked, return false
@@ -135,15 +138,15 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   
   //////////////////////// UPDATES ///////////////////////////////
   
-  void updateCursorsAndroid(TouchEvent.Pointer[] touches) {
+  /*void updateCursorsAndroid(TouchEvent.Pointer[] touches) {
     int ind = 0; //this represents our index as we iterate through both the touches list & the cursors list
-    ArrayList<Cursor> adds = new ArrayList<Cursor>(), //arraylists of the cursors we add,
-                      subs = new ArrayList<Cursor>(), //subtract,
-                      movs = new ArrayList<Cursor>(); //and move
+    ArrayList<UICursor> adds = new ArrayList<UICursor>(), //arraylists of the cursors we add,
+                        subs = new ArrayList<UICursor>(), //subtract,
+                        movs = new ArrayList<UICursor>(); //and move
     
     while(ind<touches.length || ind<cursors.size()) { //loop through both lists until we reach the end of them both
       if(ind==cursors.size() || ind<touches.length && touches[ind].id < cursors.get(ind).id) { //if the touch ID is less than the cursor ID, that means a new touch was added before this cursor. If we're past the end of cursors, a new touch was added at the end
-        Cursor curs = new Cursor(touches[ind].x, touches[ind].y).setId(touches[ind].id); //create new cursor to represent that touch
+        UICursor curs = new UICursor(this, touches[ind].id, touches[ind].x, touches[ind].y); //create new cursor to represent that touch
         //curs.press(LEFT);      //make the cursor pressed
         cursors.add(ind,curs); //add it to the list in the correct spot
         adds.add(curs);        //add it to the list of things we added
@@ -164,29 +167,25 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
       }
     }
     
-    for(Cursor curs : adds) { //update everything to account for buttons pressed,
-      setCursorSelect(curs);
-      curs.press(LEFT);
-      updateButtons(curs, (byte)1, false);
+    for(UICursor curs : adds) { //update everything to account for buttons pressed,
+      curs.press(LEFT); //simulate a left button press
       
       if(typer!=null && typer.selectMenu!=null && curs.select!=typer.selectMenu && (curs.select==null || curs.select.parent!=typer.selectMenu)) {
         typer.removeSelectMenu(); //if we press something other than the select menu, remove the select menu
       }
     }
-    for(Cursor curs : subs) { //to account for buttons released,
-      curs.release(LEFT);
-      updateButtons(curs, (byte)0, false);
-      curs.setSelect(null);
+    for(UICursor curs : subs) { //to account for buttons released,
+      curs.release(LEFT); //simualte a left button release
       
       if(typer!=null && typer.hMode==Textbox.HighlightMode.MOBILE && typer.selectMenu==null && typer.highlighting) {
         typer.addSelectMenu(); //if we tap a highlighted mobile textbox, add a select menu
       }
     }
-    for(Cursor curs : movs) { //and to account for cursors moved
+    for(UICursor curs : movs) { //and to account for cursors moved
       attemptSelectPromotion(curs);
       updateButtons(curs, (byte)3, false);
     }
-  }
+  }*/
   
   void keyPresser(char key, int keyCode, boolean snap) { //event performed every time a key is pressed
     if(typer!=null) {
@@ -194,23 +193,43 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
       //if(keyCode==66 && key==10) { hitEnter(); } else //Android only, since their enter button is fucked
       switch(key) {
         case CODED: switch(keyCode) {
-          case LEFT:
+          case LEFT: {
+            if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+            
+            boolean wasHighlighting = typer.highlighting && typer.caret!=typer.anchorCaret; //record whether we had a wide highlighted selection
+            int leftCaret = typer.getLeftCaret(); //record the caret on the left of the selection (if there is one)
+            
             typer.adjustHighlightingForArrows(shiftHeld);
             if(ctrlHeld) { typer.ctrlLeft(); }
+            else if(wasHighlighting && !shiftHeld) { typer.moveCaretTo(leftCaret,true,false,true); }
             else { typer.moveCaretBy(-1,true,snap,true); }
-          break;
-          case RIGHT:
+            if(!shiftHeld) { typer.equalizeCarets(); }
+          } break;
+          case RIGHT: {
+            if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+            
+            boolean wasHighlighting = typer.highlighting && typer.caret!=typer.anchorCaret; //record whether we had a wide highlighted selection
+            int rightCaret = typer.getRightCaret(); //record the caret on the right of the selection (if there is one)
+            
             typer.adjustHighlightingForArrows(shiftHeld);
             if(ctrlHeld) { typer.ctrlRight(); }
+            else if(wasHighlighting && !shiftHeld) { typer.moveCaretTo(rightCaret,true,false,true); }
             else { typer.moveCaretBy( 1,true,snap,true); }
-          break;
+            if(!shiftHeld) { typer.equalizeCarets(); }
+          } break;
           case 36: {
+            if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+            
             typer.adjustHighlightingForArrows(shiftHeld);
             typer.moveCaretTo(           0,true,snap,true); //home
+            if(!shiftHeld) { typer.equalizeCarets(); }
           } break;
           case 35: {
+            if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+            
             typer.adjustHighlightingForArrows(shiftHeld);
             typer.moveCaretTo(typer.size(),true,snap,true); //end
+            if(!shiftHeld) { typer.equalizeCarets(); }
           } break;
           case SHIFT  : break;
           //case CONTROL: break;
@@ -218,35 +237,72 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
           case BACKSPACE: { //(Android only) Backspace is a keyCode rather than a key. Also DELETE is the same as BACKSPACE
             boolean wasHighlighting = typer.highlighting && typer.caret != typer.anchorCaret; //first, record if we are currently highlighting
             
-            typer.eraseSelection(); //if highlighting, erase the selection
+            typer.eraseSelection(typer.hasOneActiveHandle()); //if highlighting, erase the selection
             if     (ctrlHeld        ) { typer.ctrlBackspace(true,snap,true); } //ctrl+backspace if ctrl is held
             else if(!wasHighlighting) { typer.    backspace(true,snap,true); } //otherwise, if not highlighting, backspace one character
+            typer.equalizeCarets();
+            typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
           } break;
+          
+          //case 'A': { //ctrl+A
+          //  typer.selectAll(snap); //select all
+          //} break;
+          //case 'C': if(typer.highlighting) { //ctrl+C
+          //  copyToClipboard(typer.substring(typer.getLeftCaret(), typer.getRightCaret())); //copy the selection to the clipboard
+          //} break;
+          //case 'V': { //ctrl+V
+          //  String text = getTextFromClipboard(); //grab the contents from clipboard
+          //  if(text!=null) { //if the contents were valid:
+          //    typer.eraseSelection(!typer.hasOneActiveHandle()); //if highlighting, erase the selection
+          //    typer.insert(text);     //insert the contents from the clipboard
+          //  }
+          //  typer.equalizeCarets();
+          //  typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
+          //} break;
+          //case 'X': if(typer.highlighting) { //ctrl+X
+          //  copyToClipboard(typer.substring(typer.getLeftCaret(), typer.getRightCaret())); //copy the selection to the clipboard
+          //  typer.eraseSelection(!typer.hasOneActiveHandle()); //erase the selection
+          //  typer.equalizeCarets();
+          //  typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
+          //} break;
+          
+          //case 'Y': break; //ctrl+Y
+          //case 'Z': break; //ctrl+Z
         } break;
         //case 0: switch(keyCode) {
-        //  case 2:
+        //  case 2: {
+        //    if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+        //    
         //    typer.adjustHighlightingForArrows(shiftHeld);
         //    typer.moveCaretTo(           0,true,snap,true); //home
-        //  break;
-        //  case 3:
+        //    if(!shiftHeld) { typer.equalizeCarets(); }
+        //  } break;
+        //  case 3: {
+        //    if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
+        //    
         //    typer.adjustHighlightingForArrows(shiftHeld);
         //    typer.moveCaretTo(typer.size(),true,snap,true); //end
-        //  break;
+        //    if(!shiftHeld) { typer.equalizeCarets(); }
+        //  } break;
         //} break;
         
         //case    DELETE: {
         //  boolean wasHighlighting = typer.highlighting && typer.caret != typer.anchorCaret; //first, record if we are currently highlighting
         //  
-        //  typer.eraseSelection(); //if highlighting, erase the selection
+        //  typer.eraseSelection(!typer.hasOneActiveHandle()); //if highlighting, erase the selection
         //  if     (ctrlHeld        ) { typer.ctrlDelete(true,snap,true); } //ctrl+delete if ctrl is held
         //  else if(!wasHighlighting) { typer.    delete(true,snap,true); } //otherwise, if not highlighting, delete one character
+        //  typer.equalizeCarets();
+        //  typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
         //} break;
         //case BACKSPACE: {
         //  boolean wasHighlighting = typer.highlighting && typer.caret != typer.anchorCaret; //first, record if we are currently highlighting
         //  
-        //  typer.eraseSelection(); //if highlighting, erase the selection
+        //  typer.eraseSelection(!typer.hasOneActiveHandle()); //if highlighting, erase the selection
         //  if     (ctrlHeld        ) { typer.ctrlBackspace(true,snap,true); } //ctrl+backspace if ctrl is held
         //  else if(!wasHighlighting) { typer.    backspace(true,snap,true); } //otherwise, if not highlighting, backspace one character
+        //  typer.equalizeCarets();
+        //  typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
         //} break;
         
         case 'a'-96: { //ctrl+A
@@ -258,25 +314,32 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
         case 'v'-96: { //ctrl+V
           String text = getTextFromClipboard(); //grab the contents from clipboard
           if(text!=null) { //if the contents were valid:
-            typer.eraseSelection(); //if highlighting, erase the selection
+            typer.eraseSelection(!typer.hasOneActiveHandle()); //if highlighting, erase the selection
             typer.insert(text);     //insert the contents from the clipboard
           }
+          typer.equalizeCarets();
+          typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
         } break;
         case 'x'-96: if(typer.highlighting) { //ctrl+X
           copyToClipboard(typer.substring(typer.getLeftCaret(), typer.getRightCaret())); //copy the selection to the clipboard
-          typer.eraseSelection(); //erase the selection
+          typer.eraseSelection(!typer.hasOneActiveHandle()); //erase the selection
+          typer.equalizeCarets();
+          typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
         } break;
         
         case 'y'-96: break; //ctrl+Y
         case 'z'-96: break; //ctrl+Z
         
-        default:
+        default: {
           if(key<='z'-96) { break; } //if it's a CTRL key, don't type that
           
-          typer.eraseSelection(); //if it exists, erase the highlighted selection
+          typer.eraseSelection(!typer.hasOneActiveHandle()); //if it exists, erase the highlighted selection
           
           typer.type(key,true,snap,true); //otherwise, type it
-        break;
+          
+          typer.equalizeCarets();
+          typer.buddy.moveCaretLater(typer.caret); //make sure that the caret doesn't move before the handle removal event (or rather that if it does, it gets reverted)
+        } break;
       }
       
       typer.negateHighlight(); //make sure, if both carets are now in the same place, to un-highlight
@@ -301,7 +364,7 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
     updatePressCount(); //reset all button press counts to 0
   }
   
-  void updatePanelScroll(Cursor curs) {
+  void updatePanelScroll(UICursor curs) {
     if(wheelEventX!=0 || wheelEventY!=0) { updatePanelScroll(curs, wheelEventX, wheelEventY); }
   }
   
@@ -312,7 +375,7 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   }
   
   void updateButtonHold(long time, long timePrev) { //updates all the buttons being held down
-    for(Cursor curs : cursors) { //look through all active cursors
+    for(UICursor curs : cursors) { //look through all active cursors
       if(curs.select instanceof Button) { //only focus on the ones that are selecting a button
         Button butt = (Button)curs.select; //cast to a button
         //TODO see why and when butt.cursors.get(curs) could or would ever be null. It's not supposed to be null, but it was, that's why I had to add this extra expression so it wouldn't crash
@@ -327,15 +390,24 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
     }
   }
   
-  void removeHandles() { //remove handles from textboxes scheduled to have their handles removed
-    while(handleRemovalCache.size()!=0) { //perform the following loop until all the handles are removed
-      handleRemovalCache.get(0).buddy.clearHandles(); //remove handles
-      handleRemovalCache.remove(0); //remove textbox
+  void addPendingPreOperation(Runnable r) { //adds a pre operation that can be performed later
+    pendingPreOperationsCache.add(r);
+  }
+  
+  void performPendingPreOperations() { //runs all pending pre operations
+    while(!pendingPreOperationsCache.isEmpty()) {
+      pendingPreOperationsCache.poll().run();
     }
   }
   
-  void removeHandlesLater(Textbox tbox) { //schedules for a textbox's handles to be removed later
-    handleRemovalCache.add(tbox); //literally just add it to the handle removal cache
+  void addPendingPostOperation(Runnable r) { //adds a post operation that can be performed later
+    pendingPostOperationsCache.add(r);
+  }
+  
+  void performPendingPostOperations() { //runs all pending post operations
+    while(!pendingPostOperationsCache.isEmpty()) {
+      pendingPostOperationsCache.poll().run();
+    }
   }
   
   ///////////////////// BUFFERS /////////////////////////////////

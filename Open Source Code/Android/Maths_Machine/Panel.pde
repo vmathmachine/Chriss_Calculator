@@ -103,6 +103,8 @@ public static class Panel extends Box implements Iterable<Box> {
   
   Panel setDragMode(final DragMode sx, final DragMode sy) { dragModeX = sx; dragModeY = sy; return this; } //sets the dragging mode
   
+  Panel setPromoteDist(final float dist) { promoteDist = dist; return this; }
+  
   ////////////////////// DRAWING/DISPLAY //////////////////////
   
   void display(PGraphics graph, float buffX, float buffY) {
@@ -187,7 +189,7 @@ public static class Panel extends Box implements Iterable<Box> {
   ////////////////////// UPDATES ///////////////////////////////
   
   
-  boolean updateButtons(Cursor curs, final byte code, boolean selected) { //looks through all visible buttons in a panel and updates accordingly (selected = whether the cursor has already selected something)
+  boolean updateButtons(UICursor curs, final byte code, boolean selected) { //looks through all visible buttons in a panel and updates accordingly (selected = whether the cursor has already selected something)
     for(Box b : reverse()) { //loop through all the boxes in the panel (in reverse order)
       if(b instanceof Panel) {                                     //if b is a panel: update it
         selected = ((Panel)b).updateButtons(curs, code, selected); //cast to a panel, update all inner buttons, update selected
@@ -206,7 +208,7 @@ public static class Panel extends Box implements Iterable<Box> {
   }
   
   //NOTE it is assumed when running this function that the cursor is already inside the panel's parent (or that it has no parent)
-  boolean updatePanelScroll(Cursor curs, int eventX, int eventY) { //PC only (return whether an update actually occurred)
+  boolean updatePanelScroll(UICursor curs, int eventX, int eventY) { //PC only (return whether an update actually occurred)
     if(!hitboxNoCheck(curs)) { return false; } //if mouse is not in hitbox, skip (no check because this test was already performed on the parent)
     
     for(Box b : this) { //loop through all the boxes in the panel
@@ -282,7 +284,7 @@ public static class Panel extends Box implements Iterable<Box> {
   
   ////////////////////// SWIPING FUNCTIONALITY ////////////////////
   
-  void press(final Cursor curs) { //responds to cursor press
+  void press(final UICursor curs) { //responds to cursor press
     if(!hitbox(curs)) { return; } //if cursor not inside, exit TODO see if this is necessary AND see if you can use hitboxNoCheck
     
     if(pointers.size()==0) { //if this panel has no pointers:
@@ -368,7 +370,9 @@ public static class Panel extends Box implements Iterable<Box> {
     }
     else { //if no pointers are selecting this panel, we use free form physics to move the panel (unless it's undraggable)
       switch(dragModeX) { //what we do depends on drag mode
-        case NONE: case NORMAL: break; //none/normal: do nothing (normal means we only move when selected)
+        case NONE: case NORMAL: { //none/normal: do nothing (normal means we only move when selected)
+          surfaceVx = 0;
+        } break;
         case ANDROID: if(surfaceVx!=0) { //android: if the velocity isn't 0
           float exp = exp(-airFric*delay);
           surfaceX += -(exp-1)*surfaceVx/airFric;
@@ -383,9 +387,14 @@ public static class Panel extends Box implements Iterable<Box> {
             surfaceVx = 0;                                 //set velocity to 0
           }
         } break;
+        case SWIPE: { //TODO actually implement swiping functionality
+          surfaceVx = 0; //TEMPORARY
+        } break;
       }
       switch(dragModeY) { //what we do depends on drag mode
-        case NONE: case NORMAL: break; //none/normal: do nothing
+        case NONE: case NORMAL: { //none/normal: do nothing
+          surfaceVy = 0;
+        } break;
         case ANDROID: if(surfaceVy!=0) { //android: if the velocity isn't 0
           float exp = exp(-airFric*delay);
           surfaceY += -(exp-1)*surfaceVy/airFric;
@@ -399,6 +408,9 @@ public static class Panel extends Box implements Iterable<Box> {
             surfaceY = constrain(surfaceY, h-surfaceH, 0); //constrain to in bounds
             surfaceVy = 0;                                 //set velocity to 0
           }
+        } break;
+        case SWIPE: { //TODO actually implement swiping functionality
+          surfaceVy = 0; //TEMPORARY 
         } break;
       }
     }
@@ -576,12 +588,13 @@ public static class Panel extends Box implements Iterable<Box> {
     return this; //if we're in it's hitbox, but not the hitboxes of any of its children, return this panel
   }
   
+  @Override
   public Iterator<Box> iterator() { //to iterate across the panel, just iterate across its children
     return children.iterator();
   }
   
   Iterable<Box> reverse() { return new Iterable<Box>() { //returns something you can use to iterate over the children in reverse order
-    public Iterator<Box> iterator() { return new Iterator<Box>() { //the iterator returns an iterator
+    @Override public Iterator<Box> iterator() { return new Iterator<Box>() { //the iterator returns an iterator
       int index = numChildren();                    //initial index is right after the last index
       public boolean hasNext() { return index!=0; } //has next: true if index isn't 0
       public Box next() { index--; return children.get(index); } //next: decrement index and return box at this spot

@@ -1,1 +1,0 @@
-MESSAGE  Error: cannot remove range between indices 5 and 4 from array[4]

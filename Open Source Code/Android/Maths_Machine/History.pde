@@ -211,8 +211,8 @@ class CalcHistory { //class for storing the history of questions & answers
       textbox.setOnRelease(new Action() { public void act() { if(io.typer!=null) {
         String text = textbox.getText(); //grab the text from the textbox
         if(!text.equals("")) { //if it's not empty:
-          io.typer.eraseSelection(); //erase selection (if applicable)
-          io.typer.insert(text);     //insert text
+          io.typer.eraseSelection(true); //erase selection (if applicable)
+          io.typer.insert(text);         //insert text
         }
       } } });
     }
@@ -220,7 +220,7 @@ class CalcHistory { //class for storing the history of questions & answers
       textbox.setOnRelease(new Action() { public void act() { if(io.typer!=null) {
         String text = textbox.getText(); //grab the text from the textbox
         if(!text.equals("")) { //if it's not empty:
-          io.typer.eraseSelection();     //erase selection (if applicable)
+          io.typer.eraseSelection(true); //erase selection (if applicable)
           io.typer.insert("("+text+")"); //insert text (making sure to wrap it in quotes)
         }
       } } });

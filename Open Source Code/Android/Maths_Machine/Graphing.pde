@@ -294,7 +294,7 @@ public class Graph { //an object which can graph things out
     if(!visible) { return; } //if not visible, don't interact
     
     ArrayList<Cursor> interact = new ArrayList<Cursor>(); //arraylist of all cursors which are interacting with the graph
-    for(Cursor curs : mmio.cursors) { //loop through all cursors
+    for(UICursor curs : mmio.cursors) { //loop through all cursors
       if(curs.anyPressed() && (curs.getSelect()==null || curs.getSelect() instanceof Mmio)) { interact.add(curs); } //add all cursors which are pressing and are selecting nothing (or selecting the MMIO)
     }
     
@@ -331,7 +331,7 @@ public class Graph { //an object which can graph things out
 }
 
 public class Graph3D extends Graph {
-  //something should be noted. For the sake of complying with the general accepted right hand rule, we will be plotting coordinates as such: <x,-z,-y>
+  //Something should be noted. For the sake of complying with the general accepted right hand rule, we will be plotting coordinates as such: <x,-z,-y>
   
   ////////// ATTRIBUTES //////////////
   
@@ -368,6 +368,8 @@ public class Graph3D extends Graph {
     
     graph.endDraw();
     pgraph.image(graph,x,y);
+    
+    drawLabels(pgraph,x,y);
   }
   
   void drawGridLines(PGraphics pgraph) {
@@ -420,11 +422,73 @@ public class Graph3D extends Graph {
         }
         for(long z=zStart;z<zEnd;z++) { //loop through all ticks in the z direction
           if(z!=0) {
-            pgraph.line(50*xCut-0.5*tickLen,-50*(float)(origZ+z*tickSize*pixPerUnit),-50*zCut,50*xCut+0.5*tickLen,-50*(float)(origZ+z*tickSize*pixPerUnit),-50*zCut); //draw each tick at appropriate lengths
+            pgraph.line(50*xCut-0.5*tickLen,-50*(float)(origZ+z*tickSize*pixPerUnit),-50*zCut,50*xCut+0.5*tickLen,-50*(float)(origZ+z*tickSize*pixPerUnit),-50*yCut); //draw each tick at appropriate lengths
           }
         }
       }
     }
+  }
+  
+  void drawLabels(PGraphics pgraph, float xShift, float yShift) {
+    if(equatList.axisMode==2) {
+      //Since this is on a base 10 logarithmic scale, a logical first step would be to take the base 10 logarithm of our hypothetical tick size
+      double log = Math.log(1/(8*pixPerUnit))/Math.log(10); //according to our rule, the tick size should be >= 10^log
+      double ceil = Math.ceil(log), frac = ceil-log; //record the ceiling of the log, as well as the fractional difference. Our tick size should either be 10^ceil, 1/2*10^ceil, or 1/5*10^ceil.
+      String ticAsString;   //to get an EXACT decimal tick size w/out roundoff, we'll compute the tick size as a string then cast to a double
+      double splitSize; //we'll also be drawing fainter lines between the ticks, and we also need to compute the distance between those. But they don't need to be as accurate
+      int splitPerTick; //number of splitter lines per tick
+      if     (frac<Math.log(2)/Math.log(10)) { ticAsString = "1E"+(long)ceil;     splitPerTick = 5; } //0 <= frac < log10(2): 10^ceil
+      else if(frac<Math.log(5)/Math.log(10)) { ticAsString = "5E"+(long)(ceil-1); splitPerTick = 5; } //log10(2) <= frac < log10(5): 10^ceil / 2
+      else                                   { ticAsString = "2E"+(long)(ceil-1); splitPerTick = 4; } //log10(5) <= frac < 1: 10^ceil / 5
+      
+      double tickSize = Double.valueOf(ticAsString); //cast string to double, now we have the tick size
+      splitSize = tickSize/splitPerTick;             //compute split size
+    
+      //Step 2: Find where to draw the first & last gridlines. You should overshoot in all directions, so that the splitters between them don't disappear right before the edge of the screen.
+      long xStart = (long)Math.ceil((-1-origX)/(pixPerUnit*tickSize)), //which multiple of tickSize to start with in the x direction
+           xEnd   = (long)Math.ceil(( 1-origX)/(pixPerUnit*tickSize)), //which multiple to end with
+           yStart = (long)Math.ceil((-1-origY)/(pixPerUnit*tickSize)), //same in the y direction, but different because up/down are reversed on screens
+           yEnd   = (long)Math.ceil(( 1-origY)/(pixPerUnit*tickSize)), //same in the y direction
+           zStart = (long)Math.ceil((-1-origZ)/(pixPerUnit*tickSize)), //same in the z direction
+           zEnd   = (long)Math.ceil(( 1-origZ)/(pixPerUnit*tickSize)); //same in the z direction
+      
+      float xCut = constrain((float)origX,-1,1), yCut = constrain((float)origY,-1,1), zCut = constrain((float)origZ,-1,1);
+      pgraph.stroke(255);
+      float weight = pgraph.strokeWeight; pgraph.strokeWeight(5);
+      
+      pgraph.textSize(0.05*width); pgraph.textAlign(CENTER,CENTER); pgraph.fill(-1);
+      
+      for(long x=xStart;x<xEnd;x++) { //loop through all ticks in the x direction
+        if(x!=0) {
+          String label = new Complex(x*tickSize).toString(12);
+          drawText(pgraph, label, 50*(float)(origX+x*tickSize*pixPerUnit),-50*zCut,-50*yCut-tickLen, xShift, yShift, tickSize);
+        }
+      }
+      for(long y=yStart;y<yEnd;y++) { //loop through all ticks in the y direction
+        if(y!=0) {
+          String label = new Complex(y*tickSize).toString(12);
+          drawText(pgraph, label, 50*xCut,-50*zCut-tickLen,-50*(float)(origY+y*tickSize*pixPerUnit), xShift, yShift, tickSize);
+        }
+      }
+      for(long z=zStart;z<zEnd;z++) { //loop through all ticks in the z direction
+        if(z!=0) {
+          String label = new Complex(z*tickSize).toString(12);
+          drawText(pgraph, label, 50*xCut+tickLen,-50*(float)(origZ+z*tickSize*pixPerUnit),-50*yCut, xShift, yShift, tickSize);
+        }
+      }
+      
+      pgraph.fill(#ff0000); drawText(pgraph, "x", 55,-50*zCut,-50*yCut, xShift, yShift, tickSize);
+      pgraph.fill(#00ff00); drawText(pgraph, "y", 50*xCut,-50*zCut,-55, xShift, yShift, tickSize);
+      pgraph.fill(#0000ff); drawText(pgraph, "z", 50*xCut,-55,-50*yCut, xShift, yShift, tickSize);
+      
+      pgraph.strokeWeight(weight);
+    }
+  }
+  
+  void drawText(PGraphics pgraph, String text, float x, float y, float z, float xShift, float yShift, double tickSize) {
+    PVector adjusted = new PVector(); reference.mult(new PVector(x,y,z), adjusted);
+    float inv = -graph.height*sqrt(3)/2/(adjusted.z-200);
+    pgraph.text(text, inv*adjusted.x+0.5*graph.width+xShift, inv*adjusted.y+0.5*graph.height+yShift);
   }
   
   void graph3D(PGraphics pgraph, ArrayList<Graphable> plots, ConnectMode mode) {
@@ -657,7 +721,7 @@ public class Graph3D extends Graph {
     if(!visible) { return; } //if not visible, don't interact
     
     ArrayList<Cursor> interact = new ArrayList<Cursor>(); //arraylist of all cursors which are interacting with the graph
-    for(Cursor curs : mmio.cursors) { //loop through all cursors
+    for(UICursor curs : mmio.cursors) { //loop through all cursors
       if(curs.anyPressed() && (curs.getSelect()==null || curs.getSelect() instanceof Mmio)) { interact.add(curs); } //add all cursors which are pressing and are selecting nothing (or selecting the MMIO)
     }
     
