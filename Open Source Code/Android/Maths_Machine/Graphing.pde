@@ -210,13 +210,20 @@ public class Graph { //an object which can graph things out
       
       feed.put(f.mode.inputs()[0],new MathObj(new Complex(inp))); //tell the solver to plug in this value for x/θ/t
       
-      MathObj out = f.function.solve(feed); //compute the output
-      if(out.type == f.mode.outType()) {    //if output type is compatible with graph type:
-        if(out.isNum()) { works = out.number.isReal() && Double.isFinite(out.number.re); } //if number, we mark this point as plottable if it's real and finite
-        else { works = out.vector.size()==2 && out.vector.isReal() && Double.isFinite(out.vector.get(0).re) && Double.isFinite(out.vector.get(1).re); } //if vector, we mark as plottable if 2D, real, and finite
+      MathObj out;
+      try {
+        out = f.function.solve(feed); //compute the output
+        if(out.type == f.mode.outType()) {    //if output type is compatible with graph type:
+          if(out.isNum()) { works = out.number.isReal() && Double.isFinite(out.number.re); } //if number, we mark this point as plottable if it's real and finite
+          else { works = out.vector.size()==2 && out.vector.isReal() && Double.isFinite(out.vector.get(0).re) && Double.isFinite(out.vector.get(1).re); } //if vector, we mark as plottable if 2D, real, and finite
+        }
+        else { works = false; } //otherwise, it isn't plottable
+        //TODO give slight leeway for numbers with very small imaginary part, adjust algorithm so odd vertical asymptotes don't get connected
       }
-      else { works = false; } //otherwise, it isn't plottable
-      //TODO give slight leeway for numbers with very small imaginary part, adjust algorithm so odd vertical asymptotes don't get connected
+      catch(CalculationException ex) {
+        works = false;
+        out = new MathObj();
+      }
       
       if(works) { //if point is plottable:
         switch(f.mode) { //figure out which point we're plotting
@@ -589,7 +596,15 @@ public class Graph3D extends Graph {
         double inp2 = start2+scale2*n; //compute 2nd input
         feed.put(f.mode.inputs()[1],new MathObj(new Complex(inp2))); //tell the solver to plug in this value for y/r/φ/u
         
-        MathObj out = f.function.solve(feed); //compute the output
+        MathObj out;
+        try {
+          out = f.function.solve(feed); //compute the output
+        }
+        catch(CalculationException ex) {
+          out = new MathObj();
+        }
+        //TODO see why on earth this try catch tree looks so much different than the one for plot 2D???
+        
         switch(f.mode) {
           case RECT3D: {
             points[m][n][0]=inp1; points[m][n][1]=inp2;

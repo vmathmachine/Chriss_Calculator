@@ -133,6 +133,8 @@ void initializeHistoryDisplay(final float lrBuff, final float topHig, final floa
   
   query.setMargin(relativeMarginWidth*width); //give us some more space on the left and right
   
+  history.varStore = loadVariablesFromDisk(sharedPref);
+  
   io.setTyper(query); //set the typer to the query box
 }
 
@@ -317,16 +319,18 @@ void findAnswer(CalcHistory history) {
   equat.setUnaryOperators();            //convert + and - to unary operators where appropriate
   
   String valid = equat.validStrings();
-  if(!valid.equals("valid"))                              { history.addEntry(io.typer.getText()+"", valid, new MathObj(valid), true); }
-  else if(!(valid=equat.    validPars()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(valid), true); }
-  else if(!(valid=equat.leftMeHanging()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(valid), true); }
-  else if(!(valid=equat.  countCommas()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(valid), true); }
+  if(!valid.equals("valid"))                              { history.addEntry(io.typer.getText()+"", valid, new MathObj(false, valid), true); }
+  else if(!(valid=equat.    validPars()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(false, valid), true); }
+  else if(!(valid=equat.leftMeHanging()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(false, valid), true); }
+  else if(!(valid=equat.  countCommas()).equals("valid")) { history.addEntry(io.typer.getText()+"", valid, new MathObj(false, valid), true); }
   else {
     equat = equat.shuntingYard(); //convert from infix to postfix
     equat.parseNumbers();         //parse the numbers
     equat.arrangeRecursiveFunctions(); //implement recursive functions
     
-    HashMap<String, MathObj> mapper = new HashMap<String, MathObj>(); //create map of variable names to their values
+    //HashMap<String, MathObj> mapper = new HashMap<String, MathObj>(); //create map of variable names to their values
+    
+    HashMap<String, MathObj> mapper = history.varStore;
     
     int ind;
     for(ind=0; ind<history.entries && !history.getAnswerExact(ind).isNormal(); ind++) { } //find the most recent answer that isn't a message or empty
@@ -343,12 +347,29 @@ void findAnswer(CalcHistory history) {
     }
     println("Time for full solve: "+0.001*(System.currentTimeMillis()-time2)+"s"); //DEBUG*/
     
+    String[] keyList = new String[mapper.size()];
+    int keyInd = 0;
+    for(Map.Entry<String,MathObj> entry : mapper.entrySet()) {
+      keyList[keyInd++] = entry.getKey(); //record all the keys before this operation
+    }
     
-    MathObj answer = equat.solve(mapper);
+    
+    MathObj answer;
+    try {
+      answer = equat.solve(mapper);
+    }
+    catch(CalculationException ex) {
+      answer = new MathObj(false, ex.getMessage());
+    }
+    catch(Exception ex) {
+      answer = new MathObj(false, "INTERNAL EXCEPTION: "+ex.getClass().getSimpleName()+": "+ex.getMessage());
+    }
+    
+    saveVariablesToDisk(sharedPref, keyList, mapper);
     
     //if(answer.isNum() && answer.number.equals(69)) {  } //TODO make this play the sound "nice" as a joke
     
-    history.addEntry(io.typer.getText()+"", answer+"", answer, true);
+    history.addEntry(io.typer.getText().toString(), answer.toString(), answer, true);
     
     io.typer.clear2(); io.typer.fixWidth(); io.typer.caret=0; io.typer.setScrollX(0);
   }

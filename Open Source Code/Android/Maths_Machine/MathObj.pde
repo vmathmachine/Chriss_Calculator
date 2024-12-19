@@ -8,21 +8,26 @@ public static class MathObj { //represents any mathematical object we can plug i
   public String message="";   //a string (usually error message)
   public VarType type = VarType.NONE; //type of variable
   public Equation equation = null; //an equation
+  public String variable=null;
   
   public boolean fp = false; //whether it's displayed at full precision (usually false)
   
-  public enum VarType {BOOLEAN,COMPLEX,VECTOR,MATRIX,DATE,ARRAY,EQUATION,MESSAGE,NONE; String toString() { return name().toLowerCase(); } }
+  public enum VarType {BOOLEAN,COMPLEX,VECTOR,MATRIX,DATE,ARRAY,EQUATION,VARIABLE,MESSAGE,NONE; String toString() { return name().toLowerCase(); } }
   
   public MathObj()             { type=VarType.NONE; }
   public MathObj(Complex c)    { number=c; type=VarType.COMPLEX; }
   public MathObj(double d)     { number=new Complex(d); type=VarType.COMPLEX; }
   public MathObj(boolean b)    { bool=b; type=VarType.BOOLEAN; }
-  public MathObj(String s)     { message=s; type=VarType.MESSAGE; }
+  //public MathObj(String s)     { message=s; type=VarType.MESSAGE; }
   public MathObj(CVector v)    { vector=v; type=VarType.VECTOR; }
   public MathObj(CMatrix m)    { matrix=m; type=VarType.MATRIX; }
   public MathObj(Date d)       { date=d; type=VarType.DATE; }
   public MathObj(Equation e)   { equation=e; type=VarType.EQUATION; }
   public MathObj(MathObj... a) { array=a; type=VarType.ARRAY; }
+  public MathObj(boolean t, String s) { //this will initialize either a variable or an error message
+    if(t) { variable = s; type = VarType.VARIABLE; }
+    else  { message = s; type = VarType.MESSAGE; }
+  }
   
   public MathObj(Entry e) {
     if(e.getType()==EntryType.NUM) { number = Cpx.complex(e.getId()); type=VarType.COMPLEX; }
@@ -104,12 +109,18 @@ public static class MathObj { //represents any mathematical object we can plug i
   boolean isArray() { return type==VarType.ARRAY; }
   boolean isMessage() { return type==VarType.MESSAGE; }
   boolean isEquation() { return type==VarType.EQUATION; }
+  boolean isVariable() { return type==VarType.VARIABLE; }
   boolean isNone() { return type==VarType.NONE; }
   
   boolean isNormal() { return type!=VarType.NONE && type!=VarType.MESSAGE; }
   
+  MathObj passByValue(HashMap<String, MathObj> mapper) { //if applicable, it dereferences a variable object
+    if(isVariable() && mapper.containsKey(variable)) { return mapper.get(variable); }
+    return this;
+  }
+  
   void set(MathObj m) {
-    bool=m.bool; number=m.number; vector=m.vector; matrix=m.matrix; message=m.message;
+    bool=m.bool; number=m.number; vector=m.vector; matrix=m.matrix; date=m.date; array=m.array; variable=m.variable; message=m.message;
     type = m.type;
   }
   
@@ -119,11 +130,11 @@ public static class MathObj { //represents any mathematical object we can plug i
     Complex.omit_Option = !fp;
     int dig = fp ? -1 : 13;
     switch(type) {
-      case COMPLEX: res = number.toString(dig); break;
-      case BOOLEAN: res = bool+"";              break;
-      case VECTOR: res = vector.toString(dig);  break;
-      case MATRIX: res = matrix.toString(dig);  break;
-      case DATE:   res = date.toString();       break;
+      case COMPLEX: res = number.toString(dig);   break;
+      case BOOLEAN: res = Boolean.toString(bool); break;
+      case VECTOR: res = vector.toString(dig);    break;
+      case MATRIX: res = matrix.toString(dig);    break;
+      case DATE:   res = date.toString();         break;
       case ARRAY: {
         StringBuilder sb = new StringBuilder("{");
         for(int n=0;n<array.length;n++) {
@@ -133,7 +144,8 @@ public static class MathObj { //represents any mathematical object we can plug i
         }
         res = sb.append("}").toString();
       } break;
-      case MESSAGE: res = message;              break;
+      case MESSAGE: res = message;               break;
+      case VARIABLE: res = "$VAR{"+variable+"}"; break;
       default: res = "NULL";
     }
     Complex.omit_Option=true;
@@ -155,7 +167,8 @@ public static class MathObj { //represents any mathematical object we can plug i
         }
         return new MathObj(copyArr); //return resulting array
       }
-      case MESSAGE: return new MathObj(message+"");
+      case VARIABLE: return new MathObj(true, variable+"");
+      case MESSAGE: return new MathObj(false, message+"");
       case EQUATION: return new MathObj(equation); //TODO FOR NOW, WE ARE NOT CLONING THE EQUATION. THIS MIGHT CHANGE LATER
       case NONE: return new MathObj();
     }
@@ -281,7 +294,7 @@ public static class MathObj { //represents any mathematical object we can plug i
         return new MathObj(elements); //return a math object created from that array
       }
       case "MESSAGE ": {
-        return new MathObj(s.substring(9));
+        return new MathObj(false, s.substring(9));
       }
       case "EQUATION": {
         throw new RuntimeException("I'm not ready to load an equation from a file!!!");

@@ -46,6 +46,28 @@ public static class Entry {
     return id.equals(e.id);
   }
   
+  String showFormattedId() { //some operators/functions are wrapped in __ (so that the compiler can differentiate different versions), and this prints them out without the __s
+    int leftInd = 0, rightInd = id.length(); //we're going to use these indices to slice off the opening and closing __s (if any)
+    if(id.length()>=2 && id.charAt(0)=='_' && id.charAt(1)=='_') { //if it starts with 2 underscores:
+      leftInd=2;
+      while(leftInd<id.length() && id.charAt(leftInd)=='_') { //set our left index to the first index of a non-underscore
+        leftInd++;
+      }
+    }
+    if(id.length()>=2 && id.charAt(rightInd-1)=='_' && id.charAt(rightInd-2)=='_') { //if it ends with 2 underscores:
+      rightInd-=2;
+      while(rightInd>=0 && id.charAt(rightInd-1)=='_') { //set our right index to the index right after the last non-underscore
+        rightInd--;
+      }
+    }
+    
+    if(leftInd==0 && rightInd==id.length()) { return id; } //if not wrapped in __s, just return the ID as is
+    
+    if(leftInd >= rightInd) { return ""; } //special case: if the ID is composed entirely of underscores, return empty string
+    
+    return id.substring(leftInd, rightInd); //otherwise, return the string, but with the underscores removed
+  }
+  
   public static EntryType getType(String i) { //infers the entry type from the string identification
     
     boolean isDouble = true; //try to cast to double
@@ -66,13 +88,14 @@ public static class Entry {
       case "·": case "•": case "×":
       case "&": case "|": case "&&": case "||": case "==": case "!=":
       case "=": case "<": case ">": case "<=": case ">=": case ":":
-      case "?:": case "\\": case "_":                                return EntryType.LASSOP; //these are all left associative operators
-      case "^": case "?":                                            return EntryType.RASSOP; //^, ? are right associative operators
-      case "(":                                                      return EntryType.LPAR;   //(: left parenthesis
-      case ")": case "]": case "}":                                  return EntryType.RPAR;   //): right parenthesis
-      case "²": case "³": case "!":                                  return EntryType.RUNOP;  //right function type
-      case "(-)": case "~":                                          return EntryType.LUNOP;  //left unary operator
-      case ",":                                                      return EntryType.COMMA;  //comma
+      case ";":
+      case "?:": case "\\": case "_":                                return EntryType.LASSOP;    //these are all left associative operators
+      case "^": case "?": case ":=":                                 return EntryType.RASSOP;    //^, ?, := are right associative operators
+      case "(":                                                      return EntryType.LPAR;      //(: left parenthesis
+      case ")": case "]": case "}":                                  return EntryType.RPAR;      //): right parenthesis
+      case "²": case "³": case "!":                                  return EntryType.RUNOP;     //right function type
+      case "__-__": case "__!__": case "~":                          return EntryType.LUNOP;   //left unary operator
+      case ",":                                                      return EntryType.COMMA;     //comma
     }
     return EntryType.NONE; //otherwise, you done fucked up
   }
@@ -81,31 +104,33 @@ public static class Entry {
     if(i==null) { return 0; } //special case: return 0
     
     switch(i) {
-      case ":=": return 1; //assignment: lowest precedence (not yet implemented)
-      case "?": case ":": case "?:": return 2; //ternary: next precedence
+      case ";": return 1; //semicolons & other statement separators: absolute lowest possible precedence
+      
+      case ":=": return 2; //assignment: lowest precedence
+      case "?": case ":": case "?:": return 3; //ternary: next precedence
       
       //boolean
-      case "||": return 3; //OR: lowest precedence
-      case "&&": return 4; //AND: next precedence
+      case "||": return 4; //OR: lowest precedence
+      case "&&": return 5; //AND: next precedence
       
-      case "|": return 5; //bitwise OR
+      case "|": return 6; //bitwise OR
       //RIGHT BETWEEN THESE TWO COMES XOR, but currently, XOR is just the caret, which has extremely high precedence
-      case "&": return 6; //bitwise AND
+      case "&": return 7; //bitwise AND
       
       //comparisons
-      case "=": case "==": case "!=":           return 7; //tests for equality
-      case "<": case ">": case "<=": case ">=": return 8; //inequalities
+      case "=": case "==": case "!=":           return 8; //tests for equality
+      case "<": case ">": case "<=": case ">=": return 9; //inequalities
       
       //theoretically, bit shifting operators would go here, but as of now, I have no intention to implement them
       
       //arithmetic
-      case "+": case "-":                                 return  9; //lowest precedence: +/-
-      case "*": case "/": case "%": case "//": case "\\": return 10; //next precedence: times, divide, modulo, truncated divide, left divide
-      case "·": case "•": case "×":                       return 11; //dot and cross product have higher precedence, so that they can be performed before scalar multiplication
-      case "(-)": case "~":                               return 12; //negation and other unary operators have higher precedence
-      case "^": case "²": case "³": case "!":             return 13; //highest precedence: exponent (and factorial)
+      case "+": case "-":                                 return 10; //lowest precedence: +/-
+      case "*": case "/": case "%": case "//": case "\\": return 11; //next precedence: times, divide, modulo, truncated divide, left divide
+      case "·": case "•": case "×":                       return 12; //dot and cross product have higher precedence, so that they can be performed before scalar multiplication
+      case "__-__": case "__!__": case "~":               return 13; //negation and other unary operators have higher precedence
+      case "^": case "²": case "³": case "!":             return 14; //highest precedence: exponent (and factorial)
       
-      case "_":                                           return 14; //subscript operator: even higher precedence
+      case "_":                                           return 15; //subscript operator: even higher precedence
     }
     
     return 0; //for pretty much anything else, precedence doesn't even apply

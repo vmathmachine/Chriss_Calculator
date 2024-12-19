@@ -1,0 +1,1 @@
+Error: cannot remove range between indices 1 and 5 from array[4]

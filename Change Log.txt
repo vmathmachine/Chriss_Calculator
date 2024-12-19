@@ -1,11 +1,29 @@
-The text selection mechanism was finished.
+Removed huge bottleneck in text editing mechanism, vastly speeding up the calculator's overall performance (you should notice it takes less time for the calculator to open, to copy over large amounts of text, and to display answers that contain large amounts of text).
 
-New matrix functions were added (such as eigenrow, eigencolumn, diag, etc).
+Added variables and variable assignment (i.e. v:=3. This now makes the calculator Turing complete). Such variables can then be used later. To unset a variable, simply use the function unset([variable name]).
 
-Fixed a bug whereby some button presses weren't registered (especially if pressed in rapid succession).
+Added semicolon statement separator (i.e. v:=3; v+7 sets v to 3 and prints out 10)
 
-Fixed a bug where press-and-hold functionality would get temporarily disabled for seemingly no reason.
+Added do, while, and for loops
 
-Synchronized fonts so as to allow all applicable characters to render.
+Added scope function (allowing you to define new variables in an isolated scope)
 
-Added labels for 3D graphing.
+Added the toFrac and toMixed functions, which convert the input into fractions or mixed numbers.
+
+Added randNorm, which generates a normal random variable (a random point on the bell curve).
+
+Added inverse error function.
+
+Allowed the nCr function to work for larger values of n and r, provided they're both integers.
+
+Added replace function for arrays, allowing for the editing of individual elements.
+
+Fixed bug where zeta function doesn't work at 0.
+
+Fixed bug where the calculator tries to perform operations on error messgaes...instead of just canceling everything and displaying the error message.
+
+Made error messages less misleading (negation symbol is referred to as - instead of (-), ! symbol is referred to as ! instead of ~)
+
+Fixed bug where, if your answer is an array, and you exit and re-enter the app, Ans will no longer reference the array answer.
+
+Added support for newline and tab characters, treating them as whitespace. (Allows you to write code in a separate editor and copy-paste it into the calculator to run it without having to format it)

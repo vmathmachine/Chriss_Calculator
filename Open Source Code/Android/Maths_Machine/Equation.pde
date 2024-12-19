@@ -15,7 +15,12 @@ public static class Equation implements Iterable<Entry> {
   @Override
   public String toString() {
     String res = "";
-    for(Entry s : tokens) { res+=s.getId()+", "; }
+    //for(Entry s : tokens) { res+=s.getId()+", "; }
+    for(Entry s : tokens) {
+      res += s.getId();
+      if(s.getId().equals("Equation")) { res += "("+s.asNum.equation+")"; }
+      res += ", ";
+    }
     return res;
   }
   
@@ -37,7 +42,7 @@ public static class Equation implements Iterable<Entry> {
       Entry curr = get(n), trail = get(n-1); //record current & previous entries
       
       if(curr.getId().equals("!") && !trail.rightNum()) { //if this entry is a !, and the previous entry WASN'T the right of a number:
-        tokens.set(n,new Entry("~"));                     //replace the ! with the NOT symbol
+        tokens.set(n,new Entry("__!__"));                 //replace the ! with the NOT symbol
       }
     }
   }
@@ -57,8 +62,8 @@ public static class Equation implements Iterable<Entry> {
     for(int n=1;n<size();n++) { //loop through every token (except the initial ( at the beginning)
       Entry curr = get(n), trail = get(n-1); //record current & previous entries
       if((curr.getId().equals("+") || curr.getId().equals("-")) && !trail.rightNum()) { //if this is a + or -, and the previous token isn't a number:
-        if(curr.getId().equals("+")) { tokens.remove(n); --n;          } //+: remove token & go back 1 step TODO see if this is a mistake, i.e. if there are cases where this is syntactically inaccurate
-        else                         { tokens.set(n,new Entry("(-)")); } //-: swap minus sign with negation
+        if(curr.getId().equals("+")) { tokens.remove(n); --n;            } //+: remove token & go back 1 step TODO see if this is a mistake, i.e. if there are cases where this is syntactically inaccurate
+        else                         { tokens.set(n,new Entry("__-__")); } //-: swap minus sign with negation
       }
     }
   }
@@ -107,7 +112,7 @@ public static class Equation implements Iterable<Entry> {
       else if(curr.getType()==EntryType.COMMA) { //if it's a comma:
         Entry e = records.peek(); //record the current top of the stack
         e.inps++;                 //increment the number of inputs
-        if(e.inps > functionDictionary.minMax.get(e.id)[1]) { return "Error: too many inputs for function "+e.id; } //if too many, return message saying so
+        if(e.inps > functionDictionary.minMax.get(e.id)[1]) { return "Error: too many inputs for function "+e.id; } //if too many inputs, return message saying so
       }
       else if(curr.getType()==EntryType.RPAR) { //if this has a right parenthesis,
         Entry e = records.peek(); //record the current top of the stack
@@ -259,18 +264,23 @@ public static class Equation implements Iterable<Entry> {
     //TODO this
   }*/
   
-  public MathObj solve(HashMap<String, MathObj> mapper) {
+  public MathObj solve(HashMap<String, MathObj> mapper) throws CalculationException {
     ArrayList<MathObj> out = new ArrayList<MathObj>(); //array of all the mathematical objects we analyze to read this
     
     for(Entry e : this) { //loop through all entries
       switch(e.getType()) { //switch the entry type
         case NUM: out.add(e.asNum.clone()); break; //number ("number"): add the already calculated number to the list
         case CONST: { //constant:
-          MathObj vari = mapper.get(e.getId()); //grab the linked variable
-          MathObj addMe;                        //variable to add
-          if(vari==null) { addMe = new MathObj(e); } //if there is none, try casting it to a math Object
-          else           { addMe = vari.clone();   } //otherwise, add the linked variable
-          if(addMe.type==MathObj.VarType.NONE) { return new MathObj("Cannot evaluate variable \""+e.getId()+"\""); } //if we get nothing, return an error message
+          MathObj addMe; //variable to add
+          
+          addMe = new MathObj(e); //try casting e to a math object
+          if(addMe.type==MathObj.VarType.NONE) {  //if that doesn't work,
+            addMe = new MathObj(true, e.getId()); //set it to represent the variable
+          }
+          
+          //if(vari==null) { addMe = new MathObj(e); } //if there is none, try casting it to a math Object
+          //else           { addMe = vari.clone();   } //otherwise, add the linked variable
+          if(addMe.type==MathObj.VarType.NONE) { throw new CalculationException("Cannot evaluate variable \""+e.getId()+"\""); } //if we get nothing, throw an error message
           out.add(addMe); //otherwise, add it to the list
         } break;
         case COMMA:
@@ -283,7 +293,7 @@ public static class Equation implements Iterable<Entry> {
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
-          if(out.size()<e.inps) { return new MathObj("BIG ERROR: too many commas / not enough inputs in function "+e.getId()+" ("+out.size()+", "+e.inps+")"); }
+          if(out.size()<e.inps) { throw new CalculationException("BIG ERROR: too many commas / not enough inputs in function "+e.getId()+" ("+out.size()+", "+e.inps+")"); }
           
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
@@ -299,7 +309,7 @@ public static class Equation implements Iterable<Entry> {
           
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
-          MathFunc function = FuncList.find(options, inp);
+          MathFunc function = FuncList.find(options, inp, mapper);
           
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
@@ -307,14 +317,17 @@ public static class Equation implements Iterable<Entry> {
             String inpList = inp.length==1 ? "":"inputs "; //create a string listing all the input types
             for(int n=0;n<inp.length;n++) { if(n!=0) { inpList+=", "; } inpList+=inp[n].type; }
             if(inp.length==0) { inpList="empty input set"; }
-            return new MathObj("Error: cannot evaluate function \""+e.id+"\" on "+inpList);
+            throw new CalculationException("Error: cannot evaluate function \""+e.showFormattedId()+"\" on "+inpList);
           }
           
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
-          MathObj res;
-          try { res = function.lambda.func(mapper, inp); } //evaluate the given function
-          catch(Exception ex) { res = new MathObj(ex.getMessage()); } //if there was an error in the evaluation, return an error message telling us what went wrong
+          //MathObj res;
+          //try { res = function.lambda.func(mapper, inp); } //evaluate the given function
+          //catch(Exception ex) { res = new MathObj(ex.getMessage()); } //if there was an error in the evaluation, return an error message telling us what went wrong
+          //TODO make this only catch the exceptions that were supposed to be caught (I think???)
+          
+          MathObj res = function.lambda.func(mapper, inp); //evaluate the given function
           
           if(showPerformance) { dTime = System.nanoTime()-time; timeRec[ind] += dTime; timeRecSq[ind] += dTime*dTime; time += dTime; ++ind; }
           
@@ -334,8 +347,14 @@ public static class Equation implements Iterable<Entry> {
       }
     }
     
-    if(out.size()!=1) { return new MathObj("Error: for some reason, not everything was evaluated"); }
-    return out.get(0);
+    if(out.size()!=1) { throw new CalculationException("Error: for some reason, not everything was evaluated"); }
+    
+    if(out.get(0).isVariable()) { //if it's a variable
+      MathObj vari = mapper.get(out.get(0).variable); //dereference it
+      if(vari==null) { } //I don't really know what to do here?
+      else { return vari; }
+    }
+    return out.get(0); //otherwise, return the math object itself
   }
   
   boolean checkForVar(String v) { //checks for use of a particular variable within an equation
@@ -421,17 +440,21 @@ public static class Equation implements Iterable<Entry> {
   public static int[] recursiveCheck(String func) { //given a function, this'll tell us which indices of its input set corresponds to which link
     switch(func) {
       case "&&": case "||":                                                        return new int[] {1}; //&& and ||: link 0 is input 1 (not input 0)
-      case "Σ(": case "Sigma(": case "Π(": case "Pi(": case "AND(": case "OR(":    return new int[] {0,3}; //sum and product: link 0 is input 0, link 1 is input 3 (variable, start, end, equation)
-      case "plug(": case "d/dx(": case "d²/dx²(": case "d^2/dx^2(": case "limit(": return new int[] {0,2}; //plug, derivatives: link 0 is input 0, link 1 is input 2 (variable, value, equation [epsilon] [method])
-      case "BuildVec(": case "BuildArray(":                                        return new int[] {1,2}; //build vector: link 0 is input 1, link 1 is input 2 (size, variable, equation for each element)
-      case "dⁿ/dxⁿ(": case "d^n/dx^n(":                                            return new int[] {1,3}; //n-th derivative: link 0 is input 1, link 1 is input 3 (n, variable, value, equation [epsilon] [method])
-      case "∫(": case "Integral(":                                                 return new int[] {0,3}; //integral: link 0 is input 0, link 1 is input 3 (variable, start, end, equation [samples] [method])
-      case "Secant(":                                                              return new int[] {0,3}; //Secant method: link 0 is input 0, link 1 is input 3 (variable, x0, x1, equation)
-      case "Newton(":                                                              return new int[] {0,2,3}; //Newton's method: link 0 is input 0, link 1 is input 2, link 2 is input 3 (variable, initial, equation, derivative)
-      case "Halley(":                                                              return new int[] {0,2,3,4}; //Halley's method: link 0 is input 0, link 1 is input 2, link 2 is input 3, link 3 is input 4 (var, init, equation, derivative, second derivative)
-      case "Euler(": case "EulerMid(": case "ExpTrap(": case "RK4(":               return new int[] {0,1,5}; //Euler's & Runge Kutta method: link 0 is input 0, link 1 is input 1, link 2 is input 5 (inp var, out var, init inp, init out, final inp, derivative, [steps])
-      case "BuildMat1(":                                                           return new int[] {2,3,4}; //Build matrix (element by element): link 0 is input 2, link 1 is input 3, link 2 is input 4 (height, width, row index, column index, equation)
-      case "BuildMat2(":                                                           return new int[] {2,3};   //Build matrix (vector by vector): link 0 is input 2, link 1 is input 3 (height, width, row index, equation)
+      case "Σ(": case "Sigma(": case "Π(": case "Pi(": case "AND(": case "OR(":    return new int[] {3}; //sum and product: link 0 is input 3 (variable, start, end, equation)
+      case "plug(": case "d/dx(": case "d²/dx²(": case "d^2/dx^2(": case "limit(": return new int[] {2}; //plug, derivatives, limit: link 0 is input 2 (variable, value, equation [epsilon] [method])
+      case "BuildVec(": case "BuildArray(":                                        return new int[] {2}; //build vector/array: link 0 is input 2 (size, variable, equation for each element)
+      case "dⁿ/dxⁿ(": case "d^n/dx^n(":                                            return new int[] {3}; //n-th derivative: link 0 is input 3 (n, variable, value, equation [epsilon] [method])
+      case "∫(": case "Integral(":                                                 return new int[] {3}; //integral: link 0 is input 3 (variable, start, end, equation [samples] [method])
+      case "Secant(":                                                              return new int[] {3}; //Secant method: link 0 is input 3 (variable, x0, x1, equation)
+      case "Newton(":                                                              return new int[] {2,3}; //Newton's method: link 0 is input 2, link 1 is input 3 (variable, initial, equation, derivative)
+      case "Halley(":                                                              return new int[] {2,3,4}; //Halley's method: link 0 is input 2, link 1 is input 3, link 2 is input 4 (var, init, equation, derivative, second derivative)
+      case "Euler(": case "EulerMid(": case "ExpTrap(": case "RK4(":               return new int[] {5}; //Euler's & Runge Kutta method: link 0 is input 5 (inp var, out var, init inp, init out, final inp, derivative, [steps])
+      case "BuildMat1(":                                                           return new int[] {4}; //Build matrix (element by element): link 0 is input 4 (height, width, row index, column index, equation)
+      case "BuildMat2(":                                                           return new int[] {3}; //Build matrix (vector by vector): link 0 is input 3 (height, width, row index, equation)
+      
+      case "scope(": return new int[] {0};
+      case "while(": case "do(": return new int[] {0,1};
+      case "for(": return new int[] {3};
       
       case "?:": return new int[] {1,2}; //the ternary operator has 2 links: one which is used for true, one which is used for false
       
@@ -448,5 +471,11 @@ public static class Equation implements Iterable<Entry> {
       }
     }
     return inp; //return result
+  }
+}
+
+static class CalculationException extends Exception {
+  CalculationException(String s) {
+    super(s);
   }
 }

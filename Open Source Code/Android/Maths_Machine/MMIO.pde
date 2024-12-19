@@ -493,6 +493,19 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
     return wid;       //return the width
   }
   
+  float[] getTextWidths(String[] txts, float siz) { //gets the widths of several strings in batch, assuming fixed size
+    Buffer buff = loadBuffer(this, (byte)0, (byte)0); //load a 1x1 PGraphics object
+    buff.beginDraw();         //begin draw
+    buff.graph.textSize(siz); //set text size
+    float[] wid = new float[txts.length]; //init array of widths
+    for(int i=0;i<wid.length;i++) {       //loop through each string
+      wid[i] = buff.graph.textWidth(txts[i]); //get each individual width
+    }
+    buff.endDraw();   //end draw
+    buff.useNt();     //stop using buffer
+    return wid;       //return the width
+  }
+  
   static float getTextHeight(float siz) { return siz*1.164+0.902; } //gets the height of a text of a specific size, assuming there are no "\n"s
   
   static float invTextHeight(float siz) { return 0.859*siz-0.775; } //gets the text size needed for a particular text height

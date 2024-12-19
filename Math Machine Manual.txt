@@ -12,7 +12,7 @@ END OF PREAMBLE
 
 Installation/Updating:
 
-This application runs on Windows, Linux, and Android. It will hopefully be soon compatible with MacOS. Unfortunately, for several reasons, there will not be any official release for iOS.
+This application runs on Windows, Linux, and Android. It will hopefully soon be compatible with MacOS. Unfortunately, for several reasons, there will not be any official release for iOS.
 
 
 PC:
@@ -25,7 +25,7 @@ To update the app, you download the new version of this application. Then, in th
 
 Mobile:
 
-Note: The device you're using must run on Android OS (or be an emulator for Android OS). This includes Samsung phones, Google Pixels, the OnePlus, and many others.
+Note: The device you're using must run on Android OS (or be an emulator for Android OS). This includes Samsung phones, Google Pixels, the OnePlus, and many others. It does NOT include Apple iPhones or other iOS devices.
 
 Open the folder "Executables", open "Android", download  "maths_machine_release.apk" to your Android device. Tap the downloaded file. Open with PackageInstaller. It might warn you about Google not recognizing the developer. Press "more options", and then press "install anyway". The app "Maths_Machine" will now be a part of your app library.
 
@@ -115,13 +115,13 @@ To make the best use of space, many buttons are given special "double tap" funct
 If there's something you wanna type, but it's not available on the current keypad, try pressing the 2nd key. If you still don't see what you wanna type, try pressing the down arrow at the bottom left. It'll bring up the on screen keyboard.
 (Note that only ASCII inputs are accepted. If you type characters such as ×, π, γ, θ, •, °, etc., the calculator won't recognize it. I literally have no way to fix this bug. Sorry.)
 
-The C button clears whatever's in the textbox you're typing into (usually either the query box or the selected equation). If you tap it 10 times in a row while in the Calculator tab, it clears your entire history. If you tap it 10 times in a row while in the Equations tab, it deletes all your equations. Don't worry, you almost certainly won't accidentally press it 10 times in a row. If, at any point during the 10 tap sequence, you tap literally any other button, the counter will reset to 0.
+The C button clears whatever's in the textbox you're typing into (usually either the query box or the selected equation). If you tap it 10 times in a row while in the Calculator tab, it clears your entire history. If you tap it 10 times in a row while in the Equations tab, it deletes all your equations (your text cursor must be in an equation or it won't work). Don't worry, you almost certainly won't accidentally press it 10 times in a row. If, at any point during the 10 tap sequence, you tap literally any other button, the counter will reset to 0.
 
 The left arrow and right arrow move your cursor left or right. Unlike most keys, the left arrow, right arrow, and backspace key can all be held down to spam their functionality.
 
 If you lose track of how many parentheses you've typed, look at the left parenthesis symbol. It always displays a number showing how many unclosed left parentheses you have. If it's positive, you have too many left parentheses. If it's negative, you have too many right parentheses. Note that even if it's 0, that doesn't necessarily guarantee that all your parentheses are properly closed. For instance, the expression "())(" has just as many left parentheses as right, but since not every right parenthesis comes after its corresponding left parenthesis, it's not valid.
 
-When you press the 2nd key, it changes some of the keys displayed. π and e E become Ans and comma (Ans being the most recent answer). √ and ln become sin and cos. / becomes %. And ( and ) become Copy and Paste. These were originally added before the text highlighting functionality was implemented (and hence there was no other way to use the clipboard). After said functionality has been rigorously tested, those keys will most likely be replaced with [ and ]. It should be noted that Copy does not copy what is currently highlighted, but instead copies the entire selected textbox. It should also be noted that the % sign does NOT refer to actual percentages, and instead represents the modulo operator.
+When you press the 2nd key, it changes some of the keys displayed. π and e E become Ans and comma (Ans being the most recent answer). √ and ln become sin and cos. / becomes %. And ( and ) become Copy and Paste. These were originally added before the text highlighting functionality was implemented (and hence there was no other way to use the clipboard). After said functionality has been rigorously tested, those keys will most likely be replaced with [ and ], which are used to make vectors and matrices. It should be noted that Copy does not copy what is currently highlighted, but instead copies the entire selected textbox. It should also be noted that the % sign does NOT refer to actual percentages, and instead represents the modulo operator.
 
 In the Equations tab, things are a little different. The π key is reutilized to type out the input variable. So, in rectangular, it types x, in polar, it types θ, and in parametric, it types t. If you still wanna type π, just double tap the key. The Ans button has also been replaced with the n key. What does n do? Nothing at the moment, but it'll be very helpful for graphing at a later date.
 
@@ -136,7 +136,7 @@ Spaces can be included in queries or equations. They don't do anything, but it c
 
 How to use parametric:
 
-Plain and simple, to graph something like x=3t+7, y=-t-6, you plot it as v=[3t+7,-t-6]. The square brackets can be accessed via the on screen keyboard. In 3D, it's the same, but you have x,y,z instead of x,y.
+Plain and simple, to graph something like x=3t+7, y=-t-6, you plot it as v=[3t+7,-t-6]. The square brackets can be accessed via the on-screen keyboard. In 3D, it's the same, but you have x,y,z instead of x,y.
 
 
 Unlike the other graphing modes, where you have one scalar coordinate that's a function of other scalar coordinate(s), in parametric, the vector position is a function of other scalar(s) that aren't related to the coordinates. Hence why the equation is a vector: it's because the output is a vector.
@@ -152,7 +152,7 @@ Explanation: This creates a vector whose x component is f(t), and whose y compon
 
 Vectors, Matrices, and other datatypes:
 
-This calculator doesn't just work with numbers. On top of supporting complex numbers, it also supports booleans, vectors, matrices, arrays, and dates (e.g. January 26, 2003). The vectors and matrices are allowed to have complex components, no errors will arise from using complex number operations on them.
+This calculator doesn't just work with numbers. On top of supporting complex numbers, it also supports booleans, vectors, matrices, arrays, variables, and dates (e.g. January 26, 2003). The vectors and matrices are allowed to have complex components, no errors will arise from using complex number operations on them.
 
 To create a boolean, simply type "true" or "false". You can also generate one using equivalent expressions, such as 3<4 (true) or 5<5 (false). A full list of boolean functions is provided in the table later.
 
@@ -167,7 +167,11 @@ To invert a matrix, simply use ^-1. To transpose it, use the function T(. You ca
 
 To create a date, simply type it in the format Month day, year. So, January 7, 2009. Alternatively, the calculator also accepts the shortened 3 letter variants, such as Jan 7, 2009. It also accepts the 4 letter variant of September, Sept. These are case sensitive, though. So, the month must be capitalized, there must be a space between month and day, there must be a comma after day, and there must be a space between the comma and year. You can also omit the comma, space, and year, and it'll assume the year is this year. The constant "today" stores today's date, I'm sure you can guess what "tomorrow" and "yesterday" will return. To find the number of days between two dates, simply subtract them. So, for instance, Jan 7-Jan 3 will return 4. Likewise, you can also add or subtract numbers to or from dates. Jan 29+4 returns February 2, February 2-4 returns January 29. The "week(" function returns what day of the week a particular date falls on. Typing a day of the week (capitalized) will return the next time that day of the week happens (unless that day is today, then it returns today). To find when a particular holiday occurs during a particular year, simply enter Holiday_name(year). Not all holidays work. Easter does not currently work since that depends on the phases of the moon, which is difficult to calculate. A full list of date functions is provided in the table of functions, which will be seen later.
 
-Arrays are an important list-like data structure that allows you to store multiple components, regardless of their data type, in one location. They're created using the curly brackets {}. Unlike vectors and matrices, where the first index is index 1, for arrays, the first index is index 0. They're also a fundamental component for programming languages and Turing complete systems (a system capable of executing any algorithm). While this calculator is not yet Turing complete, it will be at a later point, and the addition of arrays is an important componet for this transition.
+Arrays are an important list-like data structure that allows you to store multiple components, regardless of their data type, in one location. They're created using the curly brackets {}. Unlike vectors and matrices, where the first index is index 1, for arrays, the first index is index 0. They're also a fundamental component for programming languages and Turing complete systems (a system capable of executing any algorithm).
+
+Variables are important as they provide the store/recall feature that many calculators have, allowing you to store a value for later use. They're also important for programming languages, and with the addition of variables and variable assignment, they now make this calculator Turing complete. To assign a value to a variable, use [variable name]:=[value]. So, for instance, "v:=3". This can also be used to reassign a variable's value, like "v:=2". To unassign a variable's value, use the unset function, i.e. "unset(v)". To see the list of all variables, use the function "showAllVars()", which returns an array containing the names of all variables with an assigned value. As of right now, the names of assigned variables cannot yet be longer than 1 character. This is because the name of that variable is not yet assigned to be something the parser looks for, and as such, the parser will treat a variable name like "Kevin" as "K*e*v*i*n". When variables are processed in an operation, the compiler first sees if the arguments are supposed to be variables. If not, the variable is passed by value (that is to say, it tries using the value stored in that variable instead of the variable itself). If that still doesn't work, it'll print an error message indicating that variables are not applicable for this operation.
+
+Variables assigned in the calculator tab cannot be referenced by equations that are graphed. This is not a bug, technically, rather just an act of personal incompetence and forgetfulness. It should be rectified in a later update.
 
 
 
@@ -193,13 +197,111 @@ takes the equation (k+5)/(k-5) and plugs in the value for k=10, evaluating to (1
 
 
 
+Programming:
 
+As of the implementation of variable assignment, this calculator is now Turing complete, officially qualifying it as a programming calculator. Variables can be assigned using :=. Statements can be executed sequentially by separating them with ;. Conditional constructs can be implemented using the ternary ?: operator, and loops can be created with do(), while(), and for().
+
+The semicolon is a binary operator that:
+ Evaluates the left operand for its effects (like assignments).
+ Returns the value of the right operand.
+
+For example:
+
+min(3+7, 2-18, (a := 7; 5+5))
+
+The first parameter evaluates to 10.
+The second evaluates to -16.
+The third assigns 7 to a, then evaluates to 10.
+The result is the minimum between the 3, -16.
+
+
+The ternary operator ?: allows for if-else statements. For example:
+
+p<7 ? (a := 3; p := 10) : (b := -7; p := 3)
+
+This is equivalent to:
+
+if(p < 7) { a = 3; p = 10; }
+else      { b = -7; p = 3; }
+
+In more complex cases, you can say something like:
+
+p<7 ?
+  for(j,3,7,p:=p+j); p^2 :
+  sin(3+3i)-p^2
+
+If p is less than 7, it will evaluate that for loop, incrementing p by all numbers between 3 and 7 inclusive, and then output p^2. If p is greater than or equal to 7, however, it will instead evaluate and return sin(3+3i)-p^2.
+
+Using these principles, it is possible to construct any algorithm. For instance, if you want to find the smallest modulus m such that there exists a square root of -1 modulo m, a square root of 2 modulo m, and a square root of 3 modulo m, the following code can be used to brute force search for it:
+
+m:=0;
+f:={false, false, false};
+while(!f_0 || !f_1 || !f_2,
+    m := m + 1;
+    f := {false, false, false};
+    for(t, 0, m-1,
+        f := {f_0 || t^2 % m == m-1, f_1 || t^2 % m == 2, f_2 || t^2 % m == 3}
+    )
+);
+m
+
+This effectively searches for an m which satisfies our conditions, setting f_0 to true if there exists a modular square root of -1, f_1 to true if there exists a modular square root of 2, and f_2 to true if there exists a modular square root of 3. The output of that code is 73, which is indeed the correct answer. To find said modular square roots, you could run:
+
+r:=0;
+while(r<73 && r^2%73!=2, r:=r+1);
+r
+
+Which outputs the first number whose square is 2 modulo 73. Repeat the same thing for r^2%73!=3 and r^2%73!=72 to find the roots of 3 and -1.
+
+If, however, you wanted to find an m which satisfies this, but is also even, you could embed the if statement "if(m is even)" like so:
+
+m:=0;
+f:={false, false, false};
+while(!f_0 || !f_1 || !f_2,
+    m := m + 1;
+    (m%2 == 0) ? (
+        f := {false, false, false};
+        for(t, 0, m-1,
+            f := {f_0 || t^2 % m == m-1, f_1 || t^2 % m == 2, f_2 || t^2 % m == 3}
+        )
+    ) : 0
+);
+m
+
+Of course, you could instead just have m increment by 2 each time so it's never odd, but that's beside the point.
+
+
+As I said, this calculator doesn't act well as a programming calculator. It lacks many features that make for effective programming, such as the ability to define your own functions, the ability to define your own custom classes, break and continue to have more control over loops, switch statements, try catch structures, or recursion. It even lacks several basic datatypes, such as strings, dictionaries, and enumerated types. But, nonetheless, it is Turing complete, so if you wanted to, you could use it to write any algorithm. However...you'd probably be better off using an actual programming language.
+
+Another thing to note is that you cannot use variable assignment on things that aren't variables. For instance, if v is an array equal to {1,2,3}, you cannot say v_0:=3. That is not allowed, because v_0 is not, itself, a variable. This is effectively the same as saying 1:=3, which....you can't set 1 to equal 3. Instead, you must use the replace() function, which creates a copy of the array where one element is replaced. In this case, you'd say v:=replace(v,0,3). That is, take v, copy it, replace its 0th element with 3, and set v equal to that new array. It should also be noted that this means that recursive structures cannot yet be implemented. For instance, v:=replace(v,0,v) would just change v from {1,2,3} to {{1,2,3},2,3}. The addition of recursive structures like this will most likely not be implemented soon, as due to the way variables are stored onto disk for later use, trying to make recursive structures would cause infinite recursion in the saving process.
+
+
+
+
+
+Errors, Exceptions, Crashes, and Infinite Loops:
+
+When entering an equation, there are two types of errors that can happen: compile-time and run-time.
+
+Compile-time errors, also known as syntax errors, are errors that are caught before the equation has even finished being parsed by the system. These typically contain things like improperly closed parentheses, invalid operators, operators put in invalid places (like a + followed by a right parenthesis), providing an incorrect number of arguments to an operation, or other things that make the query impossible to process. If you enter a query in the calculator tab that has a syntax error, it will print out the mistake you made, without deleting your current input. If done in the equation tab, the equation will refuse to save. The checkmark won't appear, your equation will still be selected, and you're supposed to get the hint that something's wrong with your syntax. This isn't just done to stop you from messing up, this is done because the calculator literally cannot save the equation in any meaningful way until its syntax errors are corrected.
+
+Runtime errors happen after the equation is parsed, during the calculation process, when it tries and fails to perform an operation. When done in the query tab, it will print out an error message explaining your mistake, but will not keep your input in the query box. Meanwhile, when it happens while graphing, it will simply not plot anything at that point. Most runtime mistakes are merely providing invalid parameters to operations, like trying to add a vector to a number or multiply a boolean by an array. These happen because this calculator is dynamically typed, so it cannot determine what type of parameters it is being fed until it's already working out the equation. Another common runtime error is when the calculator is given correctly typed parameters, but the parameters' values are bad. For instance, trying to take the fifth element of a length 3 array, or trying to find the prime factorization of π.
+
+Another issue you might come across are overflows or NaNs. These aren't technically errors, as these are valid states an answer can be in, they're just not necessarily correct. Overflows (which are basically the same as infinities) happen when the number is too big for finite precision floating points to deal with. Meanwhile, NaN, which stands for Not a Number, is simply when a number takes an undefined state, usually occurring as a result of trying to multiply an overflow by 0. Speaking of which, you might notice that 1/0 is overflow, and not undefined. This is part of the floating point standard, whereby 0 doesn't necessarily always represent 0 exactly, but can also represent an underflow; a number becoming smaller and smaller until it's too small to represent. Thus, the correct way to divide by it is to say that the result is too big or undefined, hence the overflow error. In addition, in some contexts, the reciprocal of 0 is either said to be or said to approach infinity. In which case, once again, an overflow here is the appropriate response.
+
+Another, really big issue that can happen is called an "internal exception". This happens when, during the calculation process, an exception is thrown that wasn't supposed to happen. When this happens, the calculator prints out "INTERNAL EXCEPTION:", followed by the name of the exception and the message it contains. If this happens, please notify the developer, being sure to provide the details of the error message and, if possible, the events leading up to this point. Because this isn't supposed to happen. Once again, internal exceptions are exceptions that weren't supposed to happen. The reason that it prints them out instead of crashing is because, if the incident is isolated to just the calculation process, it will most likely not affect the rest of the calculator.
+
+By contrast, if an uncaught error happens outside of the calculation process, this will cause the program to crash. On mobile, the code will temporarily uncrash, copy the error message to your clipboard, then recrash, knowing that the calculator is in an unsafe state and should not continue running. (Not unsafe for your device, just unsafe for the calculator itself). On PC, the same thing happens, except instead of recrashing, it simply exits. When this happens, please notify the developer, including the contents of what it copied to your clipboard. If something else has entered your clipboard before you could send it, please see if your device supports "clipboard history".
+
+Lastly, something else that can happen is, rather than a crash, an infinite loop. This is extremely rare to happen outside of a calculation context, and I have not seen it happen yet. However, during the calculation process, it is entirely possible to accidentally (or intentionally) execute a query that triggers an infinite loop. For instance, `while(true,3)`. As of right now, there is no contingency for this occasion. In the future, this will be fixed by the addition of an an abort button. That is to say, if a query takes more than 2 seconds to process, the enter button will be replaced by an abort button, which can be pressed to stop the query. However, that does not yet exist on this calculator, and as such, the only way to exit an infinite loop is to exit and reopen the app.
 
 
 
 
 
 Table of Functions:
+
+(#=number, v=vector, b=boolean, m=matrix, d=date, a=array, V=variable, e=expression, .=any)
 
 Operators:
 
@@ -243,7 +345,9 @@ _: Array access operator. It returns the nth element of a vector (as a scalar), 
 Other:
 
 !: factorial (#!, m!)
-
+:= : assignment (V:=.)
+; : Breaking operator. Returns the right operand without any regard for the value of the left operand. Useful for chaining together multiple statements and evaluating them one after the other. (.;.)
+, : Argument separator. Not really an operator, as it doesn't do anything to its operands except separate them
 
 
 
@@ -259,7 +363,7 @@ ulp(): Unit in the last place, the smallest amount a number can be off by in a f
 
 Elementary (non-trig):
 (): identity function ( (.) )
-√(): square root (√(#))
+√(), sqrt(): square root (√(#))
 ∛(), cbrt(): cube root (∛(#))
 ln(): natural logarithm (ln(#))
 log(): common logarithm (log(#))
@@ -308,6 +412,8 @@ abs(): Frobenius magnitude, found by taking the absolute square of each componen
 abs²(), absq(): squared Frobenius magnitude (abs²(v), abs²(#))
 norm(): Fronenius unit, divide vector by Frobenius magnitude (norm(v))
 
+In the operators section, it can be seen that vectors also support the +, -, *, /, ==, !=, _, •, and × operators.
+
 
 Matrix Functions:
 []: Matrix loading function, creates a matrix whose rows are the input vectors ([v*], [[#*]*])
@@ -331,6 +437,8 @@ row(): converts a vector into a row matrix, equivalent to just using [] (row(v))
 
 Several other analytic functions of matrices have also been defined, including ln, e^x, a^x, all trig and hyperbolic functions, and the factorial.
 
+In the operators section, it can also be seen that matrices also support the +, -, *, /, \, ^, _, ², ³, ==, and != operators.
+
 
 Array Functions:
 {}: The array loading function, creates an array whose elements are the items inputted, in order. The elements can be of any type. ({.*})
@@ -339,11 +447,21 @@ find(): Looks for a given item in an array and returns an array listing which in
 contains(): Returns (as a boolean) whether or not the given element exists at least once in the given array. (contains(a,.))
 append(): takes the given array and tacks on another element. (append(a,.))
 remove(): removes the element at the given index from the given array. (remove(a,#))
-concat(): concatenates the given arrays together. (concat(a*))
 insert(): inserts the given element into the given array at the given index. (insert(a,#,.))
+replace(): places the given element into the given index, replacing an existing element (replace(a,#,.))
+concat(): concatenates the given arrays together. (concat(a*))
 sublist(): takes a sublist between the first index (inclusive) and the second index (exclusive). (sublist(a,#,#))
 removeRange(): removes the elements from the first index (inclusive) to the second index (exclusive). (removeRange(a,#,#))
 splice(): splices one array into another array, placing the first element at the given index. (splice(a,a,#))
+
+In the operators section, it can be seen that arrays also support the _, ==, and != operators.
+
+
+Variables:
+unset(): unsets a variable, removing it from the list of variables assigned a value (unset(V))
+showAllVars(): displays a list of all variables that have values (showAllVars())
+
+In the operators section, it can be seen that variables also support the := operator.
 
 
 Date Functions:
@@ -356,6 +474,8 @@ Fathers_Day(): Father's day of that year (Fathers_Day(#))
 Halloween(): Halloween of that year (Halloween(#))
 Thanksgiving(): American Thanksgiving of that year (Thanksgiving(#))
 Christmas(): Christmas of that year (Christmas(#))
+
+In the operators section, it can be seen that dates also support the +, -, ==, !=, <, <=, >, and >= operators.
 
 
 Complex Numbers:
@@ -375,6 +495,8 @@ round(): rounds to the nearest integer (half-integers are rounded up) (round(#))
 floor(): rounds down (floor(#))
 ceil(): rounds up (ceil(#))
 frac(): fractional part; x-floor(x) (frac(#))
+toFrac(): rounds to the nearest fraction. The second parameter, if given, specifies how close the input needs to be (at least) to the resulting fraction (toFrac(#), toFrac(#,#))
+toMixed(): rounds to the nearest mixed number. The second parameter, if given, specifies how close the input needs to be (at least) to the resulting fraction (toMixed(#), toMixed(#,#))
 GCF(): greatest common factor between given inputs (GCF(#*))
 LCM(): least common multiple between given inputs (LCM(#*))
 Factor(): returns the prime factorization for the given integer (Factor(#))
@@ -394,8 +516,9 @@ min(): minimum between set of numbers (min(#*))
 Probability:
 nPr(): permutations (nPr(#,#))
 nCr(): combinations; choose (nCr(#,#))
-rand(): random number over specific range (rand(#,#))
-randInt(): random integer over specific range (randInt(#,#))
+rand(): uniformly random number over specific range (rand(#,#))
+randInt(): uniformly random integer over specific range (randInt(#,#))
+randNorm(): normally distributed random number with a given mean and standard deviation (defaulted to μ=0 and σ=1) (randNorm(), randNorm(#,#))
 
 Stirling Numbers:
 stir1(): returns the Stirling number of the first kind (stir1(#,#))
@@ -413,11 +536,14 @@ Barnes-G(): Barnes G function (Barnes-G(#))
 
 Error and Related Functions:
 erf(): error function, used to find the area under the bell curve between two points (erf(#))
-erfi(): imaginary error function, erfi(x)=erf(xi)/i (erfi(#))
 erfc(): complementary error function, 1-erf(x) (erfc(#))
+erfi(): imaginary error function, erfi(x)=erf(xi)/i (erfi(#))
 erfcx(): scaled complementary error function, e^x²(1-erf(x)) (erfcx(#))
 FresnelC(): The Fresnel cosine integral ∫ cos(x²) dx (FresnelC(#))
 FresnelS(): The Fresnel sine integral ∫ sin(x²) dx (FresnelS(#))
+invErf(): inverse error function, used to find the z score corresponding to a certain probability (invErf(#))
+invErfc(): inverse complementary error function (invErfc(#))
+invErfi(): inverse imaginary error function (invErfi(#))
 
 Zeta and Related Functions:
 ζ(), zeta(): The Riemann Zeta function (ζ(#))
@@ -466,8 +592,12 @@ PolyRoots(): Using the eigenvalue method, returns a vector containing the roots 
 
 Recursive Functions:
 plug(): plugs a given value for a given variable into a given equation. Variable name is input 1, variable value is input 2, equation is input 3 (plug(e,.,e))
+scope(): evaluates a given expression in a separate scope, allowing you to instantiate new variables locally in the scope (scope(e))
+while(): evaluates expression 2 until expression 1 stops evaluating to true. The loop will not begin if expression 1 isn't initially true. Can trigger an infinite loop if the condition never stops being satisfied (while(e,e))
+do(): evaluates expression 2 until expression 1 stops evaluating to true. The loop will not evaluate the first expression until after the first iteration has completed. Can trigger an infinite loop if the condition never stops being satisfied (do(e,e))
+for(): loops the given variable over a given range. That is to say, the variable will start at the first index, then the expression is evaluated, then the variable increases by 1, and the expression evaluated again, then the variable increases again. This continues until the variable has reached the last value, after which it evaluates the expression one last time and then quits. Can trigger a practically infinite loop if the range is too large. Can trigger an actual infinite loop if the ending index is larger than 2^53, in which case floating point inaccuracy will cause the addition of 1 to result in a roundoff error and no resulting change (for(V,#,#,e))
 Σ(), Sigma(): Performs a finite summation. Variable name is input 1, starting index is input 2, ending index is input 3, equation to sum is input 4 (Σ(e,#,#,e))
-Π(), Pi(): Performs a finite product. Variable name is input 1, starting index is input 2, ending index is input 3, equation to multiply is input 4 (Π(e,#,#,e)) 
+Π(), Pi(): Performs a finite product. Variable name is input 1, starting index is input 2, ending index is input 3, equation to multiply is input 4 (Π(e,#,#,e))
 BuildVec(): builds a vector using a set of rules, namely that it's size is the first input, the components are indexed by the second input (a variable), and each component is equal to the equation provided by the third input (BuildVec(#,e,e))
 BuildMat1(): builds a matrix of the specified size (inputs 1 & 2), whose components are indexed by the variables in inputs 3 & 4, and whose each component is found via the equation in input 5 (BuildMat1(#,#,e,e,e))
 BuildMat2(): builds a matrix of the specified size (inputs 1 & 2), whose rows are indexed by the variable in input 3, and whose each row vector is equal to the equation in input 4 (BuildMat2(#,#,e,e))
@@ -500,6 +630,7 @@ Beyond that, however, all operators will be executed based on their operator pre
 Operators can either be unary (one input), binary (two inputs), or ternary (three inputs). Unary inputs are either on the left or right of their input. For instance, - (negation) gets put on the left, while ! (factorial) gets put on the right. As of right now, there is only one ternary operator, and that's the ?: operator. The ? and : are treated as one operator, and the equation parser has to perform special protocol to fuse them into one operation.
 
 Precedence (highest to lowest):
+
 _ (indexing operator)
 ^, **, ², ³, ! (factorial)      (^ is right associative)
 - (negation), ! (logical NOT), ~ (logical NOT)
@@ -517,7 +648,7 @@ _ (indexing operator)
 ||
 
 ?:
-:= (assignment operator, not yet implemented)
+:= (assignment operator)
 
 
 

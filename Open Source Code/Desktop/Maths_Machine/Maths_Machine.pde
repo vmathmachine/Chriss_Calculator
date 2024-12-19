@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.Queue;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.EnumMap;
@@ -93,6 +94,8 @@ static PFont roboto;
 static PFont lucida;
 static PFont openSans;
 
+static java.util.Random random;
+
 void settings() {
   System.setProperty("jogl.disable.openglcore", "false"); //get the thing to work properly
   
@@ -114,6 +117,8 @@ void setup() {
   //roboto = createFont("fonts"+dirChar+"Roboto"+dirChar+"Roboto-Regular.ttf",20);
   lucida = createFont("fonts"+dirChar+"Lucida_Grande"+dirChar+"LucidaSans2.ttf",20);
   //openSans = createFont("fonts"+dirChar+"Open_Sans"+dirChar+"static"+dirChar+"OpenSans-Light.ttf",20);
+  
+  random = new java.util.Random();
   
   Textbox.defaultHandleRadius = 0.023*width;
   
@@ -144,64 +149,71 @@ void setup() {
 }
 
 void draw() {
-  background(0);
-  time = System.currentTimeMillis();
-  
-  if(io.keyLast!=null && time-io.keyTime>500 && (time-io.keyTime)%30 < (timePrev-io.keyTime)%30) { //if needed, update the keys we press and hold
-    io.keyPresser(io.keyLast, io.keyCodeLast, true);
+  try {
+    background(0);
+    time = System.currentTimeMillis();
+    
+    if(io.keyLast!=null && time-io.keyTime>500 && (time-io.keyTime)%30 < (timePrev-io.keyTime)%30) { //if needed, update the keys we press and hold
+      io.keyPresser(io.keyLast, io.keyCodeLast, true);
+    }
+    
+    io.performPendingPreOperations(); //perform all pending pre-operations that need to be executed before the rest
+    
+    io.targetAllChildren(); //perform the targeting algorithm on all boxes
+    //io.updateCursorsAndroid(touches); //Android only, records all changes in the touches[] array and updates accordingly
+    io.updateButtonHold(time, timePrev); //update the buttons that are being held down
+    io.updatePanelScroll(io.cursors.get(0)); //PC only, records all updates in the mouseWheel and updates accordingly
+    io.updatePanelDrag();       //update the act of cursor(s) dragging panel(s)
+    io.updateCaretsRecursive(); //update the caret positions (if we're dragging them)
+    io.updatePhysicsRecursive(0.001*(time - timePrev));
+    
+    io.performPendingPostOperations(); //perform all pending post-operations that could not be executed before
+    
+    
+    grapher2D.updateFromTouches(io,0,0.055555556*height); //update both graphs based on our interactions with the screen
+    grapher3D.updateFromTouches(io,0,0.055555556*height);
+    
+    updateParCount();             //update the display field for the number of parentheses
+    equatList.updateCheckmarks(); //update the checkmarks for each equation
+    
+    defDrawer.beginDraw(); //begin drawing
+    defDrawer.background(0); //set background to 0
+    defDrawer.textFont(io.font);
+    
+    grapher2D.display(defDrawer,0,0.055555556*height,width,0.9*height,equatList.plots2D()); //display 2d graph
+    
+    io.display(defDrawer,0,0); //display user interface
+    
+    defDrawer.endDraw();   //finish drawing
+    background(defDrawer); //display results
+    
+    grapher3D.display(g,0,0.055555556*height,width,0.9*height,equatList.plots3D()); //display 3d graph
+    
+    io.wheelEventX = io.wheelEventY = 0;
+    io.bufferGarbageCollect(); //garbage collect unused buffers
+    timePrev = time;           //update time
+    io.updateCursorDPos();     //update previous draw positions (ALWAYS DO THIS AT THE END)
+    
+    if(showPerformance && frameCount%30 == 1) { //DEBUG
+      float rate = 30000f/(System.currentTimeMillis()-timeLastFrame);
+      println("\nFramerate: "+rate+", frame count: "+frameCount);
+      println("Time Record: ");
+      long total=0; for(long n:timeRec) { total+=n; }
+      float mean = (float)total/numTimesRec; float vari = (float)sumTimeSq/numTimesRec - mean*mean;
+      String rec="Total time (ms): "+mean+" (+-"+sqrt(vari/numTimesRec)+")"; println(rec);
+      rec="Times (ms): "; for(long n:timeRec) { rec+=(float)n/numTimesRec+"\t"; } println(rec);
+      rec="Percentages: "; for(long n:timeRec) { rec+=n*100f/total+"\t"; } println(rec);
+      rec="Dev of Percent: "; for(int n=0;n<timeRec.length;n++) { rec+=100f*sqrt(timeRecSq[n]-(float)(timeRec[n]*timeRec[n])/total)/total+"\t"; } println(rec);
+      timeLastFrame = System.currentTimeMillis();
+    }
+    
+    //if(frameCount%30 == 1) { println(frameRate); } //DEBUG
   }
-  
-  io.performPendingPostOperations(); //perform all pending pre-operations that need to be executed before the rest
-  
-  io.targetAllChildren(); //perform the targeting algorithm on all boxes
-  //io.updateCursorsAndroid(touches); //Android only, records all changes in the touches[] array and updates accordingly
-  io.updateButtonHold(time, timePrev); //update the buttons that are being held down
-  io.updatePanelScroll(io.cursors.get(0)); //PC only, records all updates in the mouseWheel and updates accordingly
-  io.updatePanelDrag();       //update the act of cursor(s) dragging panel(s)
-  io.updateCaretsRecursive(); //update the caret positions (if we're dragging them)
-  io.updatePhysicsRecursive(0.001*(time - timePrev));
-  
-  io.performPendingPostOperations(); //perform all pending post-operations that could not be executed before
-  
-  
-  grapher2D.updateFromTouches(io,0,0.055555556*height); //update both graphs based on our interactions with the screen
-  grapher3D.updateFromTouches(io,0,0.055555556*height);
-  
-  updateParCount();             //update the display field for the number of parentheses
-  equatList.updateCheckmarks(); //update the checkmarks for each equation
-  
-  defDrawer.beginDraw(); //begin drawing
-  defDrawer.background(0); //set background to 0
-  defDrawer.textFont(io.font);
-  
-  grapher2D.display(defDrawer,0,0.055555556*height,width,0.9*height,equatList.plots2D()); //display 2d graph
-  
-  io.display(defDrawer,0,0); //display user interface
-  
-  defDrawer.endDraw();   //finish drawing
-  background(defDrawer); //display results
-  
-  grapher3D.display(g,0,0.055555556*height,width,0.9*height,equatList.plots3D()); //display 3d graph
-  
-  io.wheelEventX = io.wheelEventY = 0;
-  io.bufferGarbageCollect(); //garbage collect unused buffers
-  timePrev = time;           //update time
-  io.updateCursorDPos();     //update previous draw positions (ALWAYS DO THIS AT THE END)
-  
-  if(showPerformance && frameCount%30 == 1) { //DEBUG
-    float rate = 30000f/(System.currentTimeMillis()-timeLastFrame);
-    println("\nFramerate: "+rate+", frame count: "+frameCount);
-    println("Time Record: ");
-    long total=0; for(long n:timeRec) { total+=n; }
-    float mean = (float)total/numTimesRec; float vari = (float)sumTimeSq/numTimesRec - mean*mean;
-    String rec="Total time (ms): "+mean+" (+-"+sqrt(vari/numTimesRec)+")"; println(rec);
-    rec="Times (ms): "; for(long n:timeRec) { rec+=(float)n/numTimesRec+"\t"; } println(rec);
-    rec="Percentages: "; for(long n:timeRec) { rec+=n*100f/total+"\t"; } println(rec);
-    rec="Dev of Percent: "; for(int n=0;n<timeRec.length;n++) { rec+=100f*sqrt(timeRecSq[n]-(float)(timeRec[n]*timeRec[n])/total)/total+"\t"; } println(rec);
-    timeLastFrame = System.currentTimeMillis();
+  catch(RuntimeException ex) { //if an exception occurs
+    copyToClipboard(getUsefulInfo(ex)); //copy the exception details to the clipboard
+    //throw ex; //throw exception
+    exit();
   }
-  
-  //if(frameCount%30 == 1) { println(frameRate); } //DEBUG
 }
 
 static String getUsefulInfo(Exception ex) { //obtain useful information about an exception when it is thrown

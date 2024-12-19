@@ -112,7 +112,7 @@ public static class Textbox extends Panel {
     
     if(surfaceX==0 && w==surfaceW) { //if all the text fits on screen:
       for(SimpleText txt : texts) { //loop through all chars in the text
-        graph.text(txt+"",txt.x+getX()+surfaceX-buffX,yTop); //display them TODO make sure this actually fucking works, delete me when you're done
+        graph.text(txt.toString(),txt.x+getX()+surfaceX-buffX,yTop); //display them TODO make sure this actually fucking works, delete me when you're done
       }
     }
     else { //otherwise, use a binary search to find them
@@ -155,7 +155,7 @@ public static class Textbox extends Panel {
       if(ind2==-2) { ind2=size(); }
       
       for(int i=ind1+1;i<ind2;i++) {
-        graph.text(getText(i)+"",getX(i)+getX()+surfaceX-buffX,yTop); //display them TODO make sure this actually fucking works, delete me when you're done
+        graph.text(Character.toString(getText(i)),getX(i)+getX()+surfaceX-buffX,yTop); //display them TODO make sure this actually fucking works, delete me when you're done
       }
       
       if(ind1>=0) { //if there's clipped text on the left:
@@ -226,12 +226,10 @@ public static class Textbox extends Panel {
   String substring(int start, int stop) { //obtains the contents as a substring
     StringBuilder result = new StringBuilder(); //init to blank
     for(int n=start;n<stop;n++) {
-      result.append(texts.get(n).text);  //concat each char
+      result.append(texts.get(n).text); //concat each char
     }
-    return result.toString();            //return result
+    return result.toString();           //return result
   }
-  
-  ///////TODO replace the above /|\ mechanism with a much more efficient stringbuilder mechanism
   
   char charAt(int ind) { return texts.get(ind).text; } //obtain the character at the given position
   
@@ -261,15 +259,22 @@ public static class Textbox extends Panel {
   }
   
   float insert(String text, int pos) { //types (using insert) a string into a certain position
-    texts.ensureCapacity(texts.size()+text.length()); //ensure capacity
+    float xStart = getX(pos); //position of the text right where we're about to insert
+    float wTotal = 0;         //total width of all characters
     
-    //first, insert all the characters of text, one by one
-    float wTotal = 0; //total width of all characters
-    for(int n=0;n<text.length();n++) { //loop through all characters in text
-      float w = mmio.getTextWidth(text.charAt(n)+"",tSize);                  //calculate width of each character
-      texts.add(pos+n, new SimpleText(text.charAt(n), getX(pos)+wTotal, w)); //insert each character
-      wTotal+=w;                                                             //increment total width appropriately
+    List<SimpleText> newTexts = new ArrayList<SimpleText>(text.length()); //batch of characters to insert (pre-loaded w/ appropriate capacity)
+    
+    String[] splitter = new String[text.length()];
+    for(int i=0;i<text.length();i++) { splitter[i]=Character.toString(text.charAt(i)); } //create a list of each string we're going to insert
+    float wids[] = mmio.getTextWidths(splitter, tSize); //calculate the width of each character
+    
+    for(int n=0;n<text.length();n++) { //loop through all characters to insert
+      //float w = mmio.getTextWidth(Character.toString(text.charAt(n)),tSize); //calculate width of each character
+      newTexts.add(new SimpleText(text.charAt(n), xStart+wTotal, wids[n])); //insert each character
+      wTotal+=wids[n];                                                      //increment total width appropriately
     }
+    
+    texts.addAll(pos, newTexts); // Insert the batched elements in one go
     
     //next, shift all characters after the text appropriately
     for(int n=pos+text.length();n<size();n++) { //loop through all characters after text
@@ -293,9 +298,7 @@ public static class Textbox extends Panel {
   float remove(int pos1, int pos2) { //removes all characters from pos1 (inclusive) to pos2 (exclusive)
     //first, remove all the characters over the range, one by one
     float wTotal = getX(pos2)-getX(pos1); //total width of all removed characters (calculated before, not after)
-    for(int n=pos1;n<pos2;n++) { //loop through all elements over the range
-      texts.remove(pos1);        //repeatedly remove the first element in the range
-    }
+    texts.subList(pos1, pos2).clear();    //remove all elements in that range
     
     for(int n=pos1;n<size();n++) { //loop through all elements after the ones we deleted
       texts.get(n).x -= wTotal;    //shift their positions left by the width of that deleted string
@@ -1063,5 +1066,5 @@ static class SimpleText {
   SimpleText(char t, float x_, float w_, byte p) { this(t,x_,w_); properties=p; }
   
   @Override
-  String toString() { return text+""; }
+  String toString() { return Character.toString(text); }
 }

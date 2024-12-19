@@ -16,28 +16,28 @@ void androidInitSharedPreferences() { //initializes shared preferences object
 
 ////////////////////// CUSTOM VARIABLE SAVING / LOADING FUNCTIONALITY /////////////////////////////////
 
-void putDouble(SharedPreferences.Editor editor, String name, double dub) { //puts a double in disk with a key name
+static void putDouble(SharedPreferences.Editor editor, String name, double dub) { //puts a double in disk with a key name
   editor.putLong(name,Double.doubleToLongBits(dub)); //convert to 64 bit number, store it away
 }
 
-void putComplex(SharedPreferences.Editor editor, String name, Complex comp) { //puts a complex in disk with a key name
+static void putComplex(SharedPreferences.Editor editor, String name, Complex comp) { //puts a complex in disk with a key name
   putDouble(editor,name+" re",comp.re); //put away the real part
   putDouble(editor,name+" im",comp.im); //put away the imaginary part
 }
-void removeComplex(SharedPreferences.Editor editor, String name) { //removes a complex from disk, given the key name
+static void removeComplex(SharedPreferences.Editor editor, String name) { //removes a complex from disk, given the key name
   editor.remove(name+" re"); //remove the real part
   editor.remove(name+" im"); //remove the imaginary part
 }
 
-double getDouble(SharedPreferences pref, String name, double dub) { //grabs a double from disk, given the key name
+static double getDouble(SharedPreferences pref, String name, double dub) { //grabs a double from disk, given the key name
   return Double.longBitsToDouble(pref.getLong(name,Double.doubleToLongBits(dub))); //grab the long at that position, convert its 64 bits to a double
 }
 
-Complex getComplex(SharedPreferences pref, String name, Complex comp) { //grabs a complex from disk, given the key name
+static Complex getComplex(SharedPreferences pref, String name, Complex comp) { //grabs a complex from disk, given the key name
   return new Complex(getDouble(pref,name+" re",comp.re),getDouble(pref,name+" im",comp.im)); //grab the doubles at both positions, create complex number from real & imaginary parts
 }
 
-void putMathObj(SharedPreferences pref, SharedPreferences.Editor editor, String name, MathObj obj) { //puts a math object in disk w/ a key name
+static void putMathObj(SharedPreferences pref, SharedPreferences.Editor editor, String name, MathObj obj) { //puts a math object in disk w/ a key name
   removeMathObj(pref, editor, name); //first, remove what's already there
   
   editor.putString(name+" type",obj.type.name()); //now, put away the type
@@ -55,13 +55,20 @@ void putMathObj(SharedPreferences pref, SharedPreferences.Editor editor, String 
       }
     } break;
     case DATE: editor.putLong(name+" date",obj.date.day); break; //date: store the days since epoch
+    case VARIABLE: editor.putString(name+" variable",obj.variable); break; //variable: store the variable name
+    case ARRAY: { //array:
+      editor.putInt(name+" size",obj.array.length); //store the length
+      for(int n=0;n<obj.array.length;n++) { //loop through each component
+        putMathObj(pref, editor, name+" array ["+n+"]", obj.array[n]); //save each component
+      }
+    } break;
     case EQUATION: throw new RuntimeException("AAAAAAH! I CAN'T SAVE EQUATIONS YET!"); //equation: AAAAAAAAAAHHH!!!
     case MESSAGE: editor.putString(name+" message",obj.message); break; //message: store the message
-    case NONE: break; //none: nothing
+    case NONE: break; //none: save nothing (just knowing the type is enough)
   }
 }
 
-void removeMathObj(SharedPreferences pref, SharedPreferences.Editor editor, String name) { //removes the math object stored at a particular location
+static void removeMathObj(SharedPreferences pref, SharedPreferences.Editor editor, String name) { //removes the math object stored at a particular location
   String typeString = pref.getString(name+" type",""); //first, find the type
   if(typeString.equals("")) { return; }                //if we found nothing, there's nothing to remove (return)
   
@@ -79,13 +86,21 @@ void removeMathObj(SharedPreferences pref, SharedPreferences.Editor editor, Stri
       for(int i=1;i<=h;i++) for(int j=1;j<=w;j++) { removeComplex(editor, name+" ["+i+"]["+j+"]"); } //loop through & remove all elements
     } break;
     case "DATE": editor.remove(name+" date"); break; //date: remove the stored day
+    case "VARIABLE": editor.remove(name+" variable"); break; //variable: remove the stored variable
+    case "ARRAY": { //array:
+      int len = pref.getInt(name+" size",0); //find the length
+      editor.remove(name+" size");           //remove the length
+      for(int i=0;i<len;i++) { removeMathObj(pref, editor, name+" array ["+i+"]"); } //remove each individual element
+    } break;
     case "EQUATION": throw new RuntimeException("AAAAAAAAAAH! I CAN'T SAVE EQUATIONS YET!"); //equation: AAAAAAAAAAAAHHH!!!
     case "MESSAGE": editor.remove(name+" message"); break; //message: remove the message
-    case "NONE": break; //none: nothing
+    case "NONE": break; //none: do nothing
   }
+  
+  editor.remove(name+" type"); //remove what remains of this stored entity
 }
 
-MathObj getMathObj(SharedPreferences pref, String name) { //obtains the math object, given the keyed name
+static MathObj getMathObj(SharedPreferences pref, String name) { //obtains the math object, given the keyed name
   String typeString = pref.getString(name+" type",""); //find the type
   if(typeString.equals("")) { return new MathObj(); } //if there's nothing here, return the empty math object
   
@@ -104,8 +119,15 @@ MathObj getMathObj(SharedPreferences pref, String name) { //obtains the math obj
       return new MathObj(new CMatrix(h, w, arr)); //load matrix from dimensions & elements, return resulting math object
     }
     case "DATE": return new MathObj(new Date(pref.getLong(name+" date",0))); //date: return that date
+    case "VARIABLE": return new MathObj(true, pref.getString(name+" variable","")); //variable: return that variable
+    case "ARRAY": { //array:
+      int len = pref.getInt(name+" size",0); //find the length
+      MathObj[] arr = new MathObj[len]; //generate array to store all elements
+      for(int i=0;i<len;i++) { arr[i] = getMathObj(pref, name+" array ["+i+"]"); } //loop through array, load and set each element
+      return new MathObj(arr); //return math object containing that array
+    }
     case "EQUATION": throw new RuntimeException("AAAAAAAAAAH! I CAN'T SAVE EQUATIONS YET!"); //equation: AAAAAAAAAAAAAAAHHH!!!
-    case "MESSAGE": return new MathObj(pref.getString(name+" message","")); //message: return that message
+    case "MESSAGE": return new MathObj(false, pref.getString(name+" message","")); //message: return that message
     default: return new MathObj(); //otherwise, return empty math object
   }
 }
@@ -150,6 +172,49 @@ void loadBaseSettingsFromDisk(CalcHistory history) {
 }
 
 
+/////////////////////// SAVING/LOADING NEW VARIABLE ASSIGNMENTS TO/FROM DISK ////////////////////////////
+
+static void saveVariablesToDisk(SharedPreferences pref, String[] keys, HashMap<String, MathObj> map) {
+  SharedPreferences.Editor editor = pref.edit();
+  
+  saveVarsToDisk(pref, editor, keys, map);
+  
+  editor.apply();
+}
+
+static void saveVarsToDisk(SharedPreferences pref, SharedPreferences.Editor editor, String[] keys, HashMap<String, MathObj> map) {
+  //first, we remove all the variables (yeah, I know it's inefficient, we'll worry about that later)
+  for(int n=0;n<keys.length;n++) {
+    editor.remove("Var key "+n);
+    removeMathObj(pref, editor, "Var val "+n);
+  }
+  
+  //next, we have to add the variables back
+  int ind = 0;
+  for(Map.Entry<String, MathObj> entry : map.entrySet()) {
+    editor.putString("Var key "+ind, entry.getKey());
+    putMathObj(pref, editor, "Var val "+ind, entry.getValue());
+    ind++;
+  }
+  
+  editor.putInt("Var length", map.size()); //replace the saved number of variables
+}
+
+static HashMap<String, MathObj> loadVariablesFromDisk(SharedPreferences pref) {
+  HashMap<String, MathObj> map = new HashMap<String, MathObj>();
+  
+  //first, we find the number of variables stored
+  int numVars = pref.getInt("Var length", 0); //get the number of saved variables
+  
+  for(int n=0;n<numVars;n++) {
+    String key = pref.getString("Var key "+n, ""); //grab each key
+    MathObj val = getMathObj(pref, "Var val "+n);  //and value
+    
+    map.put(key, val); //map each key to each value
+  }
+  
+  return map;
+}
 
 
 

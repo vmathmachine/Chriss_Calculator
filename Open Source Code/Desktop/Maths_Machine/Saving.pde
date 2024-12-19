@@ -37,9 +37,18 @@ void saveBaseSettingsToDisk(CalcHistory history, String path) {
 
 void loadQuestionFromDisk(int index, Textbox question, String path) {
   BufferedReader reader = createReader(path+dirChar+"question "+index+".txt");
-  String line;
-  try { line = reader.readLine(); } catch(IOException ex) { line = null; ex.printStackTrace(); }
-  question.replace(line); //put that line into the question field
+  /*String line;
+  try { line = reader.readLine(); } catch(IOException ex) { line = null; ex.printStackTrace(); }*/
+  
+  String contents;
+  try {
+    contents = reader.lines().collect(java.util.stream.Collectors.joining("\n")); //it is now possible to have endline characters, so we must account for that
+  } catch(Exception ex) {
+    ex.printStackTrace();
+    contents = ""; //fallback in case of error
+  }
+  
+  question.replace(contents.toString()); //put that line into the question field
   try { reader.close(); } catch(IOException ex) { ex.printStackTrace(); }
 }
 
@@ -77,7 +86,9 @@ static void saveEquationsToDisk(PApplet app, boolean dim) {
   PrintWriter writer = app.createWriter("saves"+dirChar+(dim?"3":"2")+"D Equations.txt"); //open the file we have to write to
   ArrayList<EquatList.EquatField> equats = equatList.getEquats(dim); //load the equation list we have to save
   writer.println(equats.size()); //print the number of equations
+  int ind = 0;
   for(EquatList.EquatField eq : equats) { //loop through all equations
+    writer.println("Equation "+(ind++)); //print the equation index
     writer.println(hex(eq.plot.stroke)); //print their stroke,
     writer.println(eq.plot.visible);     //their visibility,
     writer.println(eq.plot.mode);        //their graphing mode,
@@ -90,27 +101,85 @@ void loadEquations() { loadEquations(false); loadEquations(true); }
 
 void loadEquations(boolean dim) {
   BufferedReader reader = createReader("saves"+dirChar+(dim?"3":"2")+"D Equations.txt");
-  int size;
-  try { size = int(reader.readLine()); }
-  catch(IOException ex) { ex.printStackTrace(); return; }
-  
-  for(int n=0;n<size;n++) {
-    String line1, line2, line3;
-    try { line1=reader.readLine(); line2=reader.readLine(); line3=reader.readLine(); }
-    catch(IOException ex) { line1=line2=line3=null; ex.printStackTrace(); }
+  try {
+    int size = int(reader.readLine()); //find the number of equations
     
-    color stroke = unhex(line1); boolean vis = line2.equals("true"); GraphMode mode = GraphMode.valueOf(line3); //grab the first 3 attributes: stroke color, visibility, and graphing mode
-    
-    String text;
-    try { text=reader.readLine(); }
-    catch(IOException ex) { text=null; ex.printStackTrace(); }
-    
-    equatList.addEquation(dim,n, stroke,vis,mode,text);
+    if(size>0) { //if nonzero:
+      
+      String line0 = reader.readLine(); //now, right here, we have to determine if we saved our equations using the old or new method
+      boolean old = !line0.equals("Equation 0");
+      
+      for(int n=0;n<size;n++) {
+        String line1 = n==0 && old ? line0 : reader.readLine(); //in the 0th equation, we have to set line1 to the line we just read. Otherwise, set it to the next line
+        
+        String line2=reader.readLine(), line3=reader.readLine(); //set lines 2 and 3 to the next lines
+        
+        color stroke = unhex(line1); boolean vis = line2.equals("true"); GraphMode mode = GraphMode.valueOf(line3); //grab the first 3 attributes: stroke color, visibility, and graphing mode
+        
+        String text; //now we gotta grab the actual text that was on this equation
+        if(old) { text=reader.readLine(); } //if it saved the old way, then we just read this line
+        else {
+          StringBuilder builder = new StringBuilder(); //otherwise, we have to add up all the lines until we reach the next equation
+          String line;
+          while((line=reader.readLine())!=null && !line.startsWith("Equation ")) { //loop through all the lines until the next equation or eof
+            builder.append(line);                              //append each line
+            if(!line.endsWith("\n")) { builder.append("\n"); } //separate each line with \n
+          }
+          builder.setLength( max(0,builder.length()-1) ); //remove last \n, if applicable
+          text = builder.toString();                      //cast to a string
+        }
+        
+        equatList.addEquation(dim,n, stroke,vis,mode,text);
+      }
+    }
   }
-  try { reader.close(); }
   catch(IOException ex) { ex.printStackTrace(); }
+  try {
+    reader.close();
+  } catch(IOException ex) {
+    ex.printStackTrace();
+  }
 }
 
+
+
+
+
+
+
+static void saveVariablesToDisk(PApplet app, HashMap<String, MathObj> map) {
+  PrintWriter writer = app.createWriter("saves"+dirChar+"variables.txt"); //load file
+  
+  for(var entry : map.entrySet()) { //loop through all variables
+    if(entry.getValue()==null) { continue; }
+    writer.println(entry.getKey()+"\t"+entry.getValue().saveAsString()); //save each key-value pair
+  }
+  
+  writer.flush(); writer.close(); //close the file
+}
+
+HashMap<String, MathObj> loadVariablesFromDisk() {
+  HashMap<String, MathObj> result = new HashMap<String, MathObj>(); //init result
+  
+  BufferedReader reader = createReader("saves"+dirChar+"variables.txt"); //load file
+  try {
+    String line = reader.readLine();
+    while(line!=null && line.length()!=0) { //loop until we run out of lines
+      int ind = line.indexOf('\t'); //find the tab
+      String varName = line.substring(0,ind); //variable name
+      MathObj value = MathObj.loadFromString(line.substring(ind+1,line.length())); //value
+      result.put(varName, value);             //assign each key-value pair
+      line = reader.readLine();               //next line
+    }
+    
+    reader.close(); //close the file
+  }
+  catch(IOException ex) { //if this throws an exception
+    ex.printStackTrace(); //print the stack trace
+  }
+  
+  return result; //return resulting hashmap
+}
 
 
 

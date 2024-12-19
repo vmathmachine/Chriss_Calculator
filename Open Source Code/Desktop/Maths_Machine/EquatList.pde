@@ -51,11 +51,11 @@ public static class EquatList { //a class for holding the list of equations to b
     
     holder2D = new Panel(0,buttHig,w,h-2*buttHig).setDragMode(DragMode.NONE, pcOrMobile ? DragMode.NONE : DragMode.ANDROID).setScrollableY(true); //create the list of 2D equations
     holder2D.setSurfaceFill(0).setStroke(#00FFFF).setParent(bigHolder);
-    holder2D.setPixPerClickV(2*holder2D.pixPerClickV); //double the vertical scroll rate
+    holder2D.setPixPerClickV(5*holder2D.pixPerClickV); //increase the vertical scroll rate
     
     holder3D = new Panel(0,buttHig,w,h-2*buttHig).setDragMode(DragMode.NONE, pcOrMobile ? DragMode.NONE : DragMode.ANDROID).setScrollableY(true); //create the list of 3D equations
     holder3D.setSurfaceFill(0).setActive(false).setStroke(#00FFFF).setParent(bigHolder);
-    holder3D.setPixPerClickV(2*holder3D.pixPerClickV); //double the vertical scroll rate
+    holder3D.setPixPerClickV(5*holder3D.pixPerClickV); //increase the vertical scroll rate
     
     //next, we have to create all the buttons
     final float buttWid = 0.25*w; //the width of all buttons

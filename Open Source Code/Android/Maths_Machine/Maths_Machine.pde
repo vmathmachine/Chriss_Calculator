@@ -3,6 +3,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.Queue;
+import java.util.List;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.EnumMap;
@@ -93,6 +94,8 @@ static boolean pcOrMobile = false; //true means pc, false means mobile (determin
 
 static long frame1 = 0, frame2 = 0;
 
+static java.util.Random random;
+
 void settings() {
   
   DisplayMetrics displayMetrics = Resources.getSystem().getDisplayMetrics();
@@ -114,6 +117,8 @@ void setup() {
   //surface.setResizable(true);
   //windowResizable(true);
   //surface.setSize(displayMetrics.widthPixels, displayMetrics.heightPixels);
+  
+  random = new java.util.Random();
   
   Textbox.defaultHandleRadius = 0.023*width;
   

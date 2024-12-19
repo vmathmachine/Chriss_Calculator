@@ -1,0 +1,1 @@
+MESSAGE  Cannot invoke "complexnumbers.Complex.sub(complexnumbers.Complex)" because "inp[0].number" is null

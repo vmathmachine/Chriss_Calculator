@@ -49,11 +49,161 @@ public static class Cpx3 extends Cpx2 {
     return ans;
   }
   
+  ////////////////////////////// ERROR FUNCTION ///////////////////////////
+  
+  public static Complex horner(Complex inp, Complex coef[]) {
+    Complex series = coef[coef.length-1].clone();
+    for(int n=coef.length-2;n>=0;n--) {
+      series.muleq(inp).addeq(coef[n]);
+    }
+    return series;
+  }
+  
+  public static Complex horner(Complex inp, double coef[]) {
+    if(coef.length==1) { return new Complex(coef[0]); }
+    Complex series = inp.mul(coef[coef.length-1]).addeq(coef[coef.length-2]);
+    for(int n=coef.length-3;n>=0;n--) {
+      series.muleq(inp).addeq(coef[n]);
+    }
+    return series;
+  }
+  
+  private static Complex inv_erf_Taylor(Complex inp) { //computes the inverse error function erf^(-1)(2x/sqrt(pi)) near 0 using a taylor's series
+    //the set of coefficients
+    double[] coef={1, 1d/3, 7d/30, 127d/630, 4369d/22680, 34807d/178200, 20036983d/97297200d, 2280356863d/10216206000d, 49020204823d/198486288000d, 65967241200001d/237588086736000d};
+    
+    Complex mul = inp.sq(); //compute the square of the input
+    Complex series = horner(mul, coef).muleq(inp); //perform the taylor's series on x^2, then multiply by x
+    
+    return series;
+  }
+  
+  private static Complex inv_erf_Asymp(Complex inp, Complex comp) { //computes the inverse error function erf^(-1)(2x/sqrt(pi)) using asymptotic expansion
+    
+    if(inp.re<0) {
+      return inv_erf_Asymp(inp.neg(), inp.add(ROOTPI2)).negeq(); //for negative inputs, reflect & negate
+    }
+    
+    Complex l1 = comp.ln().negeq().sqrt();
+    Complex l2 = l1.mul(2).ln();
+    
+    Complex l1Inv = l1.mul(2).inv();
+    
+    return l1.sub(l2.mul(l1Inv)).addeq(sub(2,l2).muleq(l2).subeq(2).muleq(l1Inv.cub()));
+  }
+  
+  private static Complex erfInv_Calc(Complex inp, boolean comp) {
+    Complex classifier = comp ? sub(ROOTPI2,inp) : inp; //this is used to classify which approximation to use
+    
+    if(1.616d*sq(classifier.re) + 0.927d*sq(classifier.im) < 1d) {
+      return inv_erf_Taylor(classifier);
+    }
+    else {
+      return inv_erf_Asymp(comp ? sub(ROOTPI2,inp) : inp, comp ? inp : sub(ROOTPI2,inp));
+    }
+  }
+  
+  public static Complex invErf(Complex inp) {
+    if(inp.equals( 1)) { return new Complex( INF); }
+    if(inp.equals(-1)) { return new Complex(-INF); }
+    
+    Complex res = erfInv_Calc(inp.mul(ROOTPI2), false); //approximate inverse error function
+    if(inp.re==0) { res.re=0; }
+    
+    for(int n=0;n<4;n++) {
+      Complex erf = erf(res).sub(inp).mul(ROOTPI2);
+      
+      res.subeq(erf.div(erf.mul(inp).addeq(exp(res.sq().negeq()))));
+    }
+    
+    return res;
+  }
+  
+  public static Complex invErfc(Complex inp) {
+    if(inp.equals(0)) { return new Complex( INF); }
+    if(inp.equals(2)) { return new Complex(-INF); }
+    
+    Complex res = erfInv_Calc(inp.mul(ROOTPI2), true); //approximate inverse error function
+    
+    for(int n=0;n<3;n++) {
+      Complex erf = inp.sub(erfc(res)).mul(ROOTPI2);
+      
+      res.subeq(erf.div(erf.mul(sub(1,inp)).addeq(exp(res.sq().negeq()))));
+    }
+    
+    return res;
+  }
+  
+  public static Complex invErfi(Complex inp) {
+    return invErf(inp.mulI()).diveqI();
+  }
+  
+  /*static Complex inv_erf_Calc(Complex inp, boolean comp) { //This computes the inverse of erf_Calc.  If comp, we perform this on √(π)i/2-inp.
+    
+    if(inp.equalsI(comp ? 0 :  ROOTPI2)) { return iTimes( INF); } //special cases: erfinv(±√(π)i/2)=±∞i
+    if(inp.equalsI(comp ? 0 : -ROOTPI2)) { return iTimes(-INF); }
+    
+    Complex z=comp ? sub(iTimes(ROOTPI2),inp): inp;
+    
+    Complex res; //this is the result
+    
+    Complex sto; //this is a storage variable for complex numbers
+    
+    if(0.92730391966D*z.re*z.re+1.615742790257D*z.im*z.im<1.0D) { //if the imaginary part is less than a certain amount, then we can solve through a taylor's series expansion
+    
+      double[] coef={1, -1.0D/3, 7.0D/30, -127.0D/630, 4369.0D/22680, -34807.0D/178200, 20036983.0D/97297200.0D, -2280356863.0D/10216206000.0D, 49020204823.0D/198486288000.0D, -65967241200001.0D/237588086736000.0D};
+      //here are our coefficients
+      
+      Complex term=z.copy();    //initialize the first term to the input
+      Complex iter=sq(z);       //initialize "iter", a number for the term to multiply by each time
+      Complex sum=zero();       //initialize the sum to 0
+      for(double d: coef) {     //loop through the coefficients
+        sum.addeq(term.mul(d)); //add the next term in the series
+        term.muleq(iter);       //compute the next term
+      }
+      res=sum; //set the result equal to this sum
+    }
+    
+    else { //otherwise, there's another really good approximation we can use
+      
+      if(z.im==0) { //if the input is real:
+        sto=ln(z.abs2()).muleq(2).addeq(LOG2); //set our storage variable to twice the logarithm of [ our input times ±√(2) ]
+        res=sqrt(ln(sto).add(sto).mul(0.5D));
+      }
+      else { //if the input is imaginary, we'll be doing basically the same thing, but shifted by √(π)/2
+        if(z.im>0) {
+          if(comp) { sto=ln(inp.divI()).mul(-2).sub(LOG2);              }
+          else     { sto=ln(add(ROOTPI2,inp.mulI())).mul(-2).sub(LOG2); }
+        }
+        else       { sto=ln(sub(ROOTPI2,z.mulI())).mul(-2).sub(LOG2);   }
+        
+        res=sqrt(ln(sto).sub(sto).mul(0.5D));
+      }
+      
+      res.muleqcsgn(z); //multiply by z's parity
+    }
+    
+    //Now, we apply three iterations of Halley's approximation
+    
+    for(int n=0;n<3;n++) {
+      sto=erf_Calc(res,comp,false).sub(inp);
+      if(comp) { res.addeq(sto.div(exp(sq(res)).add(sto.mul(res)))); }
+      else     { res.subeq(sto.div(exp(sq(res)).sub(sto.mul(res)))); }
+    }
+    
+    return res; //and return the result
+  }*/
+  
   ////////////////////////////// ZETA FUNCTIONS ///////////////////////////
   
   public static Complex zeta(Complex s) {
+    if(s.lazyabs()<4.8828125e-4d)              { return zeta0(s); }
     if(Math.abs(s.im)>30 && s.re>-4 && s.re<5) { return zeta2(s); }
     else                                       { return zeta1(s); }
+  }
+  
+  private static Complex zeta0(Complex s) { //zeta function for extremely small inputs
+    return s.mul(-1.00078519447704241d).sub(1.00317822795429243d).mul(s).sub(0.5*(LOGPI+LOG2)).mul(s).sub(0.5); //just do a Taylor's series
   }
   
   private static Complex zeta1(Complex s) {
@@ -1133,4 +1283,56 @@ static long carmichael(long inp) {
   }
   
   return tot.longValue();
+}
+
+static long[] toMixed(double inp, double err) { //this takes the input and converts it to a mixed number via continued fraction (with the error specified inside)
+  int sgn=Mafs.sgn(inp);           //this will store the sign of our input
+  double in=Math.abs(inp);         //copy the input (with a removed sign) over to in
+  long whole=(long)Math.floor(in); //whole will store the integer part of our input (with removed sign)
+  in-=whole;                       //subtract the integer part so in stores the fractional part
+  
+  double f=in;   //f is the result of each division throughout the continued fraction
+  long s;        //s stores the integer part of f
+  long num, den; //these store the numerator and denominator we're going to output (with a removed sign)
+  long c=1, d=0; //these store the previous values of num and den in the loop
+  long a=0, b=1; //these store the previous values of c and d in the loop
+  
+  //s=floor(1/in), num=1, den=floor(1/in), a=0, b=1, c=1, d=floor(1/in), f=1/(1/in-floor(1/in))
+  for(int n=0;n<100;n++) { //create a for loop to ensure we eventually stop
+    s=(long)(Math.floor(f)); //set s to the integer part of f
+    num=a+s*c;             //update the numerator and denominator
+    den=b+s*d;
+    a=c;   b=d;            //update a and b to the previous values of c and d
+    c=num; d=den;          //update c and d to the previous values of num and den
+    if(Math.abs((double)num/den-in)<err){ //if our fraction is within the margin of error, return our result
+      return new long[] {sgn*whole,sgn*num,den};
+    }
+    f=1.0D/(f-s); //subtract f's integer part, take the reciprocal, that's the new value of f
+  }
+  return null; //if we've exhausted through the loop without getting close, return null to show it didn't work
+}
+
+static String mixedNumberString(long[] mixed) { //this converts a mixed number to a string
+  String out="";                                      //this is what we will return
+  if(mixed[0]!=0||mixed[1]==0) { out+=mixed[0]+" "; } //if the integer is not 0 (or the frac part is also 0), concat it followed by a space
+  else if(mixed[1]<0)          { out+="-";          } //if the integer is 0, and the fraction is negative, concat a minus sign
+  
+  if(mixed[1]!=0) { //unless it is 0, concat the fractional part
+    out+=Math.abs(mixed[1]);
+    if(mixed[2]!=1) { out+="/"+mixed[2]; } //unless it is 1, concatenate the denominator
+  }
+  return out; //return the output string
+}
+
+static String complexMixedString(Complex inp, long[] realPart, long[] imagPart, double err) {
+  String realString = realPart==null ? inp.re+"" : mixedNumberString(realPart);
+  String imagString = imagPart==null ? inp.im+"i" : mixedNumberString(imagPart)+" i";
+  if(inp.im==1) { imagString = "i"; }
+  else if(inp.im==-1) { imagString = "-i"; }
+  
+  if(inp.equals(0)) { return "0"; }
+  else if(inp.re==0) { return imagString; }
+  else if(inp.im==0) { return realString; }
+  else if(inp.im<0) { return realString + imagString; }
+  else { return realString + "+" + imagString; }
 }

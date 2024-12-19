@@ -8,6 +8,10 @@ class CalcHistory { //class for storing the history of questions & answers
   
   Panel holder; //the panel that holds the history display
   
+  
+  HashMap<String, MathObj> varStore = new HashMap<String, MathObj>(); //list of all variables with a stored value
+  //TODO think about if this even belongs here?
+  
   CalcHistory(final Panel parent, int ent, int ind, float x, float y, float w, float h, float tboxH, float tSize) { //constructs history, given parent panel, # of entries, carousel index, x,y,width,height, textbox height, and text size
     entries = ent; carousel = ind;    //set the # of entries & the carousel index
     if(entries==-1 || carousel==-1) { //if # of entries or base index isn't specified:

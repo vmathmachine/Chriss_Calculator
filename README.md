@@ -37,6 +37,8 @@ I swear to god I don't know.
 
 I'm not a Mac user, and my only friend who owns a Mac isn't great with computers, so...I think the Mac version works? But, I honestly don't know if or how it does. If it does, it probably works similarly to how it does for Windows and Linux in the above descriptions.
 
+The Mac version has not been updated since the last update. It is not up to date.
+
 
 **Misc**
 

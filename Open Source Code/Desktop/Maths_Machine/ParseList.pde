@@ -151,7 +151,7 @@ public static class ParseList implements Iterable<String> { //a class specifical
   
   public void removeSpaces() { //removes all tokens that are just whitespace
     for(int n=0;n<size();n++) {
-      if(list.get(n).equals(" ")) { list.remove(n); n--; }
+      if(list.get(n).equals(" ") || list.get(n).equals("\t") || list.get(n).equals("\n")) { list.remove(n); n--; }
     }
   }
   
@@ -171,7 +171,7 @@ public static class ParseList implements Iterable<String> { //a class specifical
   }
   
   public void groupOps() { //group together operators when applicable (**=^, //=truncated division)
-    boolean times=false, div=false, and=false, or=false, greater=false, less=false, not=false, equals=false; //whether we're grouping *, /, &, |, >, <, !, =
+    boolean times=false, div=false, and=false, or=false, greater=false, less=false, not=false, equals=false, colon=false; //whether we're grouping *, /, &, |, >, <, !, =, :
     for(int n=0;n<size();n++) { //loop through all items
       if(list.get(n).equals("*")) { //if this item is *
         if(times) { //if the previous was also *
@@ -229,6 +229,11 @@ public static class ParseList implements Iterable<String> { //a class specifical
           list.remove(n);      //remove this entry
           n--;                 //go backwards 1
         }
+        else if(colon) { //if the previous was : :
+          list.set(n-1, ":="); //set the previous to :=
+          list.remove(n);      //remove this entry
+          n--;                 //go backwards 1
+        }
         else if(equals) { //if the previous was =:
           list.set(n-1,"=="); //set the previous to ==
           list.remove(n);     //remove this entry
@@ -241,6 +246,7 @@ public static class ParseList implements Iterable<String> { //a class specifical
       greater = list.get(n).equals(">"); //set greater to true iff this is >
       less    = list.get(n).equals("<"); //set less to true iff this is <
       not     = list.get(n).equals("!"); //set not to true iff this is !
+      colon   = list.get(n).equals(":"); //set colon to true iff this is :
     }
   }
   

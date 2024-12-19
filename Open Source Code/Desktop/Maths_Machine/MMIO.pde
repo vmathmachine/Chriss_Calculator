@@ -11,7 +11,6 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
   int buffWid=0, buffHig=0;                   //the width & height of the 2 dimensional array (yes, it must be a rectangular array, not a jagged array)
   long buffTime = System.currentTimeMillis(); //stores the time of the last attempt at buffer garbage collection
   
-  //ArrayList<UICursor> cursors = new ArrayList<UICursor>(); //all the cursors/touches/mice/pointers on screen
   CursorList<UICursor> cursors = new CursorList<UICursor>(); //all the cursors/touches/mice/pointers on screen
   
   //// specific options and key parameters
@@ -220,14 +219,14 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
             else { typer.moveCaretBy( 1,true,snap,true); }
             if(!shiftHeld) { typer.equalizeCarets(); }
           } break;
-          case 36: {
+          case 2: case 36: {
             if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
             
             typer.adjustHighlightingForArrows(shiftHeld);
             typer.moveCaretTo(           0,true,snap,true); //home
             if(!shiftHeld) { typer.equalizeCarets(); }
           } break;
-          case 35: {
+          case 3: case 35: {
             if(typer.hasOneActiveHandle()) { break; } //if we're moving around one handle, don't mess with it
             
             typer.adjustHighlightingForArrows(shiftHeld);
@@ -495,6 +494,19 @@ public static class Mmio extends Panel { //the top level parent of all the IO ob
     buff.beginDraw();         //begin draw
     buff.graph.textSize(siz); //set text size
     float wid = buff.graph.textWidth(txt); //get the width
+    buff.endDraw();   //end draw
+    buff.useNt();     //stop using buffer
+    return wid;       //return the width
+  }
+  
+  float[] getTextWidths(String[] txts, float siz) { //gets the widths of several strings in batch, assuming fixed size
+    Buffer buff = loadBuffer(this, (byte)0, (byte)0); //load a 1x1 PGraphics object
+    buff.beginDraw();         //begin draw
+    buff.graph.textSize(siz); //set text size
+    float[] wid = new float[txts.length]; //init array of widths
+    for(int i=0;i<wid.length;i++) {       //loop through each string
+      wid[i] = buff.graph.textWidth(txts[i]); //get each individual width
+    }
     buff.endDraw();   //end draw
     buff.useNt();     //stop using buffer
     return wid;       //return the width
